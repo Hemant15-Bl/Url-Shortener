@@ -4,49 +4,49 @@ SwiftLink is a production-grade, distributed URL shortening platform designed to
 Built using modern backend principles, this project demonstrates microservices architecture, event-driven design, caching, and rate limiting, similar to real-world systems.
 ## 🔥 Key Features
 - **🔐 Centralized Authentication Service**
-- - Dedicated Security Service for JWT validation across microservices
-- - OAuth2 + JWT with HttpOnly cookies for enhanced security
-- - Eliminates duplicated auth logic in downstream services
+    - Dedicated Security Service for JWT validation across microservices
+    - OAuth2 + JWT with HttpOnly cookies for enhanced security
+    - Eliminates duplicated auth logic in downstream services
 - **⚡Scalable URL Shortening**
-- - **Distributed ID generation** for unique short codes
-- - Designed to avoid collisions across services
+    - **Distributed ID generation** for unique short codes
+    - Designed to avoid collisions across services
 - **🚀 High Performance with Caching**
-- - Redis caching for frequently accessed URLs
-- - Reduces database load and improves response time
+    - Redis caching for frequently accessed URLs
+    - Reduces database load and improves response time
 - **📊 Event-Driven Analytics**
-- - Kafka-based architecture
-- - URL Service → produces click events
-- - Analytics Service → consumes and processes asynchronously
+    - Kafka-based architecture
+    - URL Service → produces click events
+    - Analytics Service → consumes and processes asynchronously
 - **🛡 Rate Limiting**
-- - Token Bucket algorithm
-- - Configured at API Gateway: 10 req/sec (burst up to 20)
+    - Token Bucket algorithm
+    - Configured at API Gateway: 10 req/sec (burst up to 20)
 - **🌐 API Gateway(Reactive)**
-- - Built with Spring Cloud Gateway (WebFlux)
-- - Handles routing, authentication, and rate limiting
+    - Built with Spring Cloud Gateway (WebFlux)
+    - Handles routing, authentication, and rate limiting
 - **🔄 Service Discovery**
-- - Eureka for dynamic service registration
+    - Eureka for dynamic service registration
 
 ## 🏗 System Design
 ### Core Services
 - **API Gateway**
-- - Entry point for all requests
-- - Implements:
-    - JWT validation via Security Service
-    - Rate limiting
-    - Request routing
+    - Entry point for all requests
+    - Implements:
+        - JWT validation via Security Service
+        - Rate limiting
+        - Request routing
 - **Security Service**
-- - Centralized authentication & token validation
-- - Shared across all services
+    - Centralized authentication & token validation
+    - Shared across all services
 - **User Service**
-- - User registration and login
+    - User registration and login
 - **URL Service**
-- - Generates short URLs using distributed ID strategy
-- - Publishes events to Kafka
+    - Generates short URLs using distributed ID strategy
+    - Publishes events to Kafka
 - **Analytics Service**
-- - Consumes Kafka events
-- - Processes click data asynchronously
+    - Consumes Kafka events
+    - Processes click data asynchronously
 - **Service Registry (Eureka)**
-- - Enables service discovery and scaling
+    - Enables service discovery and scaling
 
 ## ⚙️ Architecture Highlights
 - **Microservices + Event-Driven Design**
@@ -93,10 +93,10 @@ url-shortener/
 
 ## Installation
 - **1. Clone the repo:**
-  ``` Text
+``` Text
   git clone https://github.com/Hemant15-Bl/Url-Shortener.git
   cd Url-Shortener
-  ```
+```
 - **2. Run Backend Services:**
 Start the services in this order: Service Registry -> API Gateway -> User/URL Services.
 ``` Bash
