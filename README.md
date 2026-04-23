@@ -26,7 +26,7 @@ url-shortener/
 │   ├── url-service/       # Shortening Logic (Port: 9094)
 │   └── analytics-service/ # Tracking Logic
 └── frontend/
-    └── swiftlink-ui/      # React + Vite + Lucide + Sonner
+    └── url-Shortener-ui/      # React + Lucide + Sonner
 ```
 
 ## 🛠 Tech Stack
@@ -51,19 +51,19 @@ url-shortener/
 - Maven 3.8+
 
 ## Installation
-- **1.Clone the repo:**
-  ```bash
+- **1. Clone the repo:**
+  ``` Text
   git clone https://github.com/Hemant15-Bl/Url-Shortener.git
   cd Url-Shortener
   ```
 - **2. Run Backend Services:**
 Start the services in this order: Service Registry -> API Gateway -> User/URL Services.
-```bash
+``` Bash
 cd backend/service-registry
 mvn spring-boot:run
 ```
 - **3. Run Frontend**
-  ```bash
+  ``` Bash
 cd frontend/url-Shortener-ui
 npm install
 npm run dev
