@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: APIGATEWAY
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          default-filters:
+          - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+          routes:
+          - id: url-shortener-route
+            uri: lb://URL-SERVICE
+            predicates:
+            - Path=/api/v2/url/**
+            filters:
+            - name: JwtAuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5    # Tokens per second
+                redis-rate-limiter.burstCapacity: 10   # Max tokens a user can hold
+                key-resolver: "#{@userKeyResolver}"
+
+              # 2. Route for Redirection (The missing piece!)
+          - id: url-redirect-route
+            uri: lb://URL-SERVICE
+            predicates:
+            - Path=/{shortCode:[a-zA-Z0-9]+}  # Matches anything like /emjd, /a1b2, etc.
+            filters:
+            - name: SecretInjectionFilter
+
+          - id: analytics-route
+            uri: lb://ANALYTICS-SERVICE
+            predicates:
+            - Path=/api/v3/analytics/**
+            filters:
+            - name: JwtAuthenticationFilter
+            - name: SecretInjectionFilter
+
+          - id: kgs-route
+            uri: lb://KEY-GENERATION
+            predicates:
+            - Path=/api/v1/kgs/**
+            filters:
+            - name: JwtAuthenticationFilter
+            - name: SecretInjectionFilter
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 200566460056-qlkqa2crgiottbur2dg8k5geq2fjn04q.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+            - email
+            - profile
+
+server:
+  port: 9096
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+jwt:
+  secret: my-super-secret-key
+
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
+#    org.springframework.security.oauth2: DEBUG

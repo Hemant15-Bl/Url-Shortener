@@ -1,0 +1,75 @@
+package com.tp.main.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
+
+@Component
+public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
+
+	@Autowired
+	private JwtUtils jwtUtils; // You need to share the same key/logic here
+
+	public JwtAuthenticationFilter() {
+		super(Config.class);
+		System.out.println("DEBUG: JwtAuthenticationFilter initialized and registered!");
+	}
+
+	public static class Config {
+
+	}
+
+	@Override
+	public GatewayFilter apply(Config config) {
+		return (exchange, chain) -> {
+			// PUBLIC ROUTES: Let them pass without a token
+			String path = exchange.getRequest().getPath().toString();
+			if (path.contains("/api/v1/auth/")) {
+				return chain.filter(exchange);
+			}
+
+			String token = null;
+			
+			// 1. Try to get token from cookie
+			HttpCookie cookie = exchange.getRequest().getCookies().getFirst("AUTH_TOKEN");
+			if (cookie != null) {
+				token = cookie.getValue();
+			}
+
+			// 2. Fallback to Authorization Header (for mobile and external apis call)
+			// PROTECTED ROUTES: Validate the 'Authorization: Bearer <token>' header
+			if (token == null) {
+				String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+				if (authHeader != null && authHeader.startsWith("Bearer ")) {
+					token = authHeader.substring(7);
+
+					System.out.println("Debug - Token:- " + token);
+
+					if (jwtUtils.validateToken(token)) { // Validate the signature
+						String username = jwtUtils.extractUsername(token);
+
+						exchange.getAttributes().put("username", username);
+						System.out.println("Debug - Username:- " + username);
+
+						// Mutate the request to add the header before forwarding it
+						ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
+								.header("X-User-Header", username).header("X-Internal-Secret", "my-super-secret-key")
+								.build();
+						return chain.filter(exchange.mutate().request(modifiedRequest).build());
+					}
+				}
+			}
+
+			// If token is missing or invalid, return 401
+			exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+			return exchange.getResponse().setComplete();
+
+		};
+
+	}
+}

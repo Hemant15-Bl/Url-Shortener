@@ -1,0 +1,55 @@
+package com.tp.main.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
+
+import reactor.core.publisher.Mono;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+public class AuthController {
+	
+	@GetMapping("/me")
+    public Mono<ResponseEntity<Map<String, Object>>> getCurrentUser(ServerWebExchange exchange) {
+        // The JwtAuthenticationFilter already put the username in the attributes
+        String username = exchange.getAttribute("username");
+
+        if (username == null) {
+            return Mono.just(ResponseEntity.status(401).build());
+        }
+
+        Map<String, Object> userDetails = new HashMap<>();
+        userDetails.put("username", username);
+        // You can add more logic here to fetch profile pic or roles if needed
+        
+        return Mono.just(ResponseEntity.ok(userDetails));
+    }
+
+	@PostMapping("/logout")
+	public Mono<ResponseEntity<Void>> logout(ServerWebExchange exchange){
+		ResponseCookie clearAccess = ResponseCookie.from("AUTH_TOKEN", "")
+		.httpOnly(true)
+		.path("/")
+		.maxAge(0)
+		.build();
+		
+		ResponseCookie clearRefresh = ResponseCookie.from("REFRESH_TOKEN", "")
+				.httpOnly(true)
+				.path("/")
+				.maxAge(0)
+				.build();
+		
+		exchange.getResponse().addCookie(clearAccess);
+		exchange.getResponse().addCookie(clearRefresh);
+		
+		return Mono.just(ResponseEntity.ok().build());
+	}
+}

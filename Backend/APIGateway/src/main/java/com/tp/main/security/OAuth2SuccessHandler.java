@@ -1,0 +1,67 @@
+package com.tp.main.security;
+
+import java.net.URI;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import reactor.core.publisher.Mono;
+
+@Component
+public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler{
+
+	@Autowired
+	private JwtUtils jwtUtils;
+	
+	@Override
+	public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
+		OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+		
+		String email = oAuth2User.getAttribute("email");
+		
+		if(email == null) {
+			email = oAuth2User.getAttribute("login");
+		}
+		
+		String accessToken = this.jwtUtils.generateToken(email);
+		String refreshToken = this.jwtUtils.generateRefreshToken(email);
+		
+		// When storing token in local storage via sending token url parameter (For testing)
+//		String targetUri = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/callback")
+//							.queryParam("token", internalToken)
+//							.build().toString();
+		
+		ResponseCookie accessCookie = createCookie("AUTH_TOKEN", accessToken, 900);
+		ResponseCookie refreshCookie = createCookie("REFRESH_TOKEN", refreshToken, 604800);
+		
+		
+		
+		ServerWebExchange exchange = webFilterExchange.getExchange();
+		
+		exchange.getResponse().addCookie(accessCookie);
+		exchange.getResponse().addCookie(refreshCookie);
+		
+		exchange.getResponse().setStatusCode(HttpStatus.FOUND);
+		exchange.getResponse().getHeaders().setLocation(URI.create("http://localhost:3000/dashboard"));
+		return exchange.getResponse().setComplete();
+	}
+
+	private ResponseCookie createCookie(String name, String value, long maxAge) {
+		return ResponseCookie.from(name, value)
+				.httpOnly(true)		// Prevent JS access
+				.secure(false)		// when locally ('false') but in production ('true')
+				.path("/")			// Available for all routes
+				.maxAge(maxAge)		// 24 Hour
+				.sameSite("Lax")	// Protection against CSRF
+				.build();
+	}
+
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;KeyGeneration/src/main/resources/db/migration/V2_Create_audit_log_table.sql&apos; to &apos;V2__Create_audit_log_table.sql&apos;" description="Rename resource &apos;V2_Create_audit_log_table.sql&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/main/resources/db/migration/V2_Create_audit_log_table.sql" name="V2__Create_audit_log_table.sql" stamp="1776415307847" updateReferences="true"/>
+</session>

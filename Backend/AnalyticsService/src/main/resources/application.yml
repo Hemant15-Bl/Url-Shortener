@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: ANALYTICS-SERVICE
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: analytics-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: "com.tp.main.dto.ClickEvent"
+        spring.json.trusted.packages: "*"
+
+  data:
+    mongodb:
+      uri: mongodb://admin:qwerty@localhost:27017
+      database: spring_micro
+      username: admin
+      password: qwerty
+
+server:
+  port: 9091
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+internal:
+  secret: my-super-secret-key
+
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
+#    org.springframework.security.oauth2: DEBUG

@@ -1,0 +1,5 @@
+package com.tp.main.config;
+
+public class FeignClientConfig {
+
+}

@@ -1,0 +1,5 @@
+package com.tp.main.security;
+
+public class OAuth2SuccessHandler {
+
+}

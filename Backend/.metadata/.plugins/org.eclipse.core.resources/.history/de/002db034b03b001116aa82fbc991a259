@@ -1,0 +1,43 @@
+package com.tp.main.security;
+
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SecretInjectionFilter extends AbstractGatewayFilterFactory<SecretInjectionFilter.Config> {
+    public SecretInjectionFilter() { super(Config.class); }
+    public static class Config {}
+
+    @Override
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+        	String username = (String) exchange.getAttributes().get("username");
+        	
+        	// Allow the request if it's a redirect, even if username is null
+            String path = exchange.getRequest().getPath().toString();
+            boolean isRedirect = path.matches("/[a-zA-Z0-9]+");
+        	
+        	// If username is null, handle the error (e.g., return 401)
+        	if (username == null && !isRedirect) {
+        		System.out.println("Debug - SecretInjectionFilter:- Username is null");
+        	    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        	    return exchange.getResponse().setComplete();
+        	}
+        	
+        	// If it's a redirect and username is null, we can pass a dummy header or none
+            String userHeader = (username != null) ? username : "ANONYMOUS";
+        	
+            // No JWT validation here, just add the secret!
+            ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
+                .header("X-Internal-Secret", "my-super-secret-key")
+                .header("X-User-Header", username)
+                .build();
+    		System.out.println("Debug - SecretInjectionFilter:- Username { "+username+" }");
+
+            return chain.filter(exchange.mutate().request(modifiedRequest).build());
+        };
+    }
+}

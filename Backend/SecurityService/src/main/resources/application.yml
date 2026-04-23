@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: SecurityService
+
+server:
+  port: 9099
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+internal:
+  secret: my-super-secret-key
