@@ -1,54 +1,95 @@
 # SwiftLink: Entterprise URL Shortener
-### A high-performance Microservices ecosystem built with Spring Boot and React.
+SwiftLink is a production-grade, distributed URL shortening platform designed to handle high traffic, ensure secure authentication, and process analytics asynchronously at scale.
 
-SwiftLink it not just a url shortener: it's a full stact demonstration of modern distributed system. It features a centralized API Gateway, secure JWT-based authentication using HttpOnly cookies, and real-time analytics tracking.
+Built using modern backend principles, this project demonstrates microservices architecture, event-driven design, caching, and rate limiting, similar to real-world systems.
+## 🔥 Key Features
+- **🔐 Centralized Authentication Service**
+- - Dedicated Security Service for JWT validation across microservices
+- - OAuth2 + JWT with HttpOnly cookies for enhanced security
+- - Eliminates duplicated auth logic in downstream services
+- **⚡Scalable URL Shortening**
+- - **Distributed ID generation** for unique short codes
+- - Designed to avoid collisions across services
+- **🚀 High Performance with Caching**
+- - Redis caching for frequently accessed URLs
+- - Reduces database load and improves response time
+- **📊 Event-Driven Analytics**
+- - Kafka-based architecture
+- - URL Service → produces click events
+- - Analytics Service → consumes and processes asynchronously
+- **🛡 Rate Limiting**
+- - Token Bucket algorithm
+- - Configured at API Gateway: 10 req/sec (burst up to 20)
+- **🌐 API Gateway(Reactive)**
+- - Built with Spring Cloud Gateway (WebFlux)
+- - Handles routing, authentication, and rate limiting
+- **🔄 Service Discovery**
+- - Eureka for dynamic service registration
 
-## 🏗 System Architecture
-The application is split into a **Reactive API Gateway**, multiple **REST Microservices**, and a **React** Frontend, all communicating over a virtual network.
+## 🏗 System Design
+### Core Services
+- **API Gateway**
+- - Entry point for all requests
+- - Implements:
+    - JWT validation via Security Service
+    - Rate limiting
+    - Request routing
+- **Security Service**
+- - Centralized authentication & token validation
+- - Shared across all services
+- **User Service**
+- - User registration and login
+- **URL Service**
+- - Generates short URLs using distributed ID strategy
+- - Publishes events to Kafka
+- **Analytics Service**
+- - Consumes Kafka events
+- - Processes click data asynchronously
+- **Service Registry (Eureka)**
+- - Enables service discovery and scaling
 
-- **API Gateway:** Built with Spring Cloud Gateway (WebFlux). Handles routing, JWT validation, and session management.
-
-- **User Service:** Manages user registration and secure authentication.
-
-- **URL Service:** Handles the core logic of encoding long URLs into unique short codes.
-
-- **Analytics Service:** Tracks click rates and visitor data for every shortened link.
-
-- **Service Registry:** Eureka Discovery Server for dynamic service registration.
-
-## Repo Structure
+## ⚙️ Architecture Highlights
+- **Microservices + Event-Driven Design**
+- **Centralized Security Layer**
+- **Redis Caching for Low Latency**
+- **Kafka for Async Processing**
+- **Rate Limiting for Abuse Prevention**
+- **Stateless Services → Horizontal Scaling**
+## 🛠 Tech Stack
+### Backend
+- Java 17
+- Spring Boot 3.x
+- Spring Cloud (Gateway, Eureka)
+- Spring Security (OAuth2 + JWT)
+- Kafka (Event Streaming)
+- Redis (Caching)
+- MongoDB / MySQL
+- Maven
+### Frontend
+- React.js
+- Context API (State Management)
+- Lucide Icons
+- Sonner / SweetAlert2
+## Project Structure
 ```text
 url-shortener/
 ├── backend/
 │   ├── api-gateway/       # Spring Cloud Gateway (Port: 9096)
 │   ├── service-registry/  # Eureka Server (Port: 8761)
+|   ├── security-service/
 │   ├── user-service/      # Auth & User Mgmt (Port: 9098)
 │   ├── url-service/       # Shortening Logic (Port: 9094)
 │   └── analytics-service/ # Tracking Logic
 └── frontend/
     └── url-Shortener-ui/      # React + Lucide + Sonner
 ```
-
-## 🛠 Tech Stack
-### Backend
-- **Language:** Java 17
-- **Framework:** Spring Boot 3.x, Spring Cloud (Gateway, Eureka)
-- **Security:** Spring Security, JWT (HttpOnly Cookies)
-- **Persistence:** MongoDB / MySQL (JPA/Hibernate)
-- **Build Tool:** Maven
-
-## Frontend
-- **Library:** React.js
-- **Styling:** Modern CSS3 (SaaS Aesthetic)
-- **Icons:** Lucide-React
-- **Notifications:** Sonner & SweetAlert2
-- **State Management:** Hooks (Context API ready)
-
-## Getting Started
+## 🚀 Getting Started
 ### Prerequisites
 - JDK 17+
 - Node.js 18+
 - Maven 3.8+
+- Redis
+- Kafka
 
 ## Installation
 - **1. Clone the repo:**
@@ -63,10 +104,21 @@ cd backend/service-registry
 mvn spring-boot:run
 ```
 - **3. Run Frontend**
-  ``` Bash
+``` Bash
 cd frontend/url-Shortener-ui
 npm install
 npm run dev
 ```
+## 📈 Future Improvements
+- Geo-based analytics
+- Custom aliases for URLs
+- Multi-region deployment
+- Circuit breakers (Resilience4j)
+- Kubernetes deployment
 
 ## 📸 Screenshots
+
+## 👨‍💻 Author
+
+Hemant Barole
+GitHub: https://github.com/Hemant15-Bl
