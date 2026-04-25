@@ -117,11 +117,11 @@ npm run dev
 - Kubernetes deployment
 
 ## 📸 Screenshots
-https://github.com/Hemant15-Bl/Url-Shortener/blob/main/home.jpeg?raw=true
-https://github.com/Hemant15-Bl/Url-Shortener/blob/main/signup.jpeg?raw=true
-https://github.com/Hemant15-Bl/Url-Shortener/blob/main/signin.jpeg?raw=true
-https://github.com/Hemant15-Bl/Url-Shortener/blob/main/dashboard.jpeg?raw=true
-https://github.com/Hemant15-Bl/Url-Shortener/blob/main/analytics.jpeg?raw=true
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/home.jpeg?raw=true)
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/signup.jpeg?raw=true)
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/signin.jpeg?raw=true)
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/dashboard.jpeg?raw=true)
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/analytics.jpeg?raw=true)
 
 ## 👨‍💻 Author
 
