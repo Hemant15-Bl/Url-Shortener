@@ -118,14 +118,14 @@ npm run dev
 
 ## 💡 Engineering Decisions
 - **Why Kafka?**
-    -- Decouples analytics from request lifecycle
-    -- Improves performance and reliability
+    - Decouples analytics from request lifecycle
+    - Improves performance and reliability
 - **Why Redis?**
-    -- Reduces DB hits for frequently accessed URLs
+    - Reduces DB hits for frequently accessed URLs
 - **Why Security Service?**
-    -- Avoids duplication and centralizes authentication logic
+    - Avoids duplication and centralizes authentication logic
 - **Why Rate Limiting?**
-    -- Protects system from abuse and ensures fair usage
+    - Protects system from abuse and ensures fair usage
 
 ## 📸 Screenshots
 ![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/home.jpeg?raw=true)
