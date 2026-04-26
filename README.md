@@ -116,6 +116,17 @@ npm run dev
 - Circuit breakers (Resilience4j)
 - Kubernetes deployment
 
+## 💡 Engineering Decisions
+- **Why Kafka?**
+    -- Decouples analytics from request lifecycle
+    -- Improves performance and reliability
+- **Why Redis?**
+    -- Reduces DB hits for frequently accessed URLs
+- **Why Security Service?**
+    -- Avoids duplication and centralizes authentication logic
+- **Why Rate Limiting?**
+    -- Protects system from abuse and ensures fair usage
+
 ## 📸 Screenshots
 ![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/home.jpeg?raw=true)
 ![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/signup.jpeg?raw=true)
@@ -124,6 +135,5 @@ npm run dev
 ![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/analytics.jpeg?raw=true)
 
 ## 👨‍💻 Author
-
 Hemant Barole
 GitHub: https://github.com/Hemant15-Bl
