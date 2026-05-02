@@ -9646,3 +9646,63 @@ java.io.FileNotFoundException: F:\UrlShortener\Backend\.metadata\.plugins\org.ec
 	at org.eclipse.jgit.api.AddCommand.call(AddCommand.java:297)
 	at org.eclipse.egit.ui.internal.staging.StagingView$60.run(StagingView.java:3924)
 	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.egit.ui 4 0 2026-05-02 10:39:37.707
+!MESSAGE F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\DawnGraphiteCache\data_1 (The process cannot access the file because it is being used by another process)
+!STACK 0
+java.io.FileNotFoundException: F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\DawnGraphiteCache\data_1 (The process cannot access the file because it is being used by another process)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:213)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:152)
+	at org.eclipse.jgit.treewalk.FileTreeIterator$FileEntry.openInputStream(FileTreeIterator.java:388)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.isBinary(WorkingTreeIterator.java:471)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.possiblyFilteredLength(WorkingTreeIterator.java:418)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.getEntryContentLength(WorkingTreeIterator.java:615)
+	at org.eclipse.jgit.api.AddCommand.call(AddCommand.java:297)
+	at org.eclipse.egit.ui.internal.staging.StagingView$60.run(StagingView.java:3924)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.egit.ui 4 0 2026-05-02 10:47:50.918
+!MESSAGE F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\DawnGraphiteCache\data_1 (The process cannot access the file because it is being used by another process)
+!STACK 0
+java.io.FileNotFoundException: F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\DawnGraphiteCache\data_1 (The process cannot access the file because it is being used by another process)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:213)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:152)
+	at org.eclipse.jgit.treewalk.FileTreeIterator$FileEntry.openInputStream(FileTreeIterator.java:388)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.isBinary(WorkingTreeIterator.java:471)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.possiblyFilteredLength(WorkingTreeIterator.java:418)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.getEntryContentLength(WorkingTreeIterator.java:615)
+	at org.eclipse.jgit.api.AddCommand.call(AddCommand.java:297)
+	at org.eclipse.egit.ui.internal.staging.StagingView$60.run(StagingView.java:3924)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.egit.ui 4 0 2026-05-02 10:48:01.849
+!MESSAGE F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\DawnGraphiteCache\data_1 (The process cannot access the file because it is being used by another process)
+!STACK 0
+java.io.FileNotFoundException: F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\DawnGraphiteCache\data_1 (The process cannot access the file because it is being used by another process)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:213)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:152)
+	at org.eclipse.jgit.treewalk.FileTreeIterator$FileEntry.openInputStream(FileTreeIterator.java:388)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.isBinary(WorkingTreeIterator.java:471)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.possiblyFilteredLength(WorkingTreeIterator.java:418)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.getEntryContentLength(WorkingTreeIterator.java:615)
+	at org.eclipse.jgit.api.AddCommand.call(AddCommand.java:297)
+	at org.eclipse.egit.ui.internal.staging.StagingView$60.run(StagingView.java:3924)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.egit.ui 4 0 2026-05-02 11:12:22.388
+!MESSAGE F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\DawnGraphiteCache\data_1 (The process cannot access the file because it is being used by another process)
+!STACK 0
+java.io.FileNotFoundException: F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\DawnGraphiteCache\data_1 (The process cannot access the file because it is being used by another process)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:213)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:152)
+	at org.eclipse.jgit.treewalk.FileTreeIterator$FileEntry.openInputStream(FileTreeIterator.java:388)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.isBinary(WorkingTreeIterator.java:471)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.possiblyFilteredLength(WorkingTreeIterator.java:418)
+	at org.eclipse.jgit.treewalk.WorkingTreeIterator.getEntryContentLength(WorkingTreeIterator.java:615)
+	at org.eclipse.jgit.api.AddCommand.call(AddCommand.java:297)
+	at org.eclipse.egit.ui.internal.staging.StagingView$60.run(StagingView.java:3924)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)

@@ -1,0 +1,84 @@
+name: Build and Push to Docker Hub
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      discovery: ${{ steps.filter.outputs.discovery }}
+      security: ${{ steps.filter.outputs.security }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      kgs: ${{ steps.filter.outputs.kgs }}
+      url: ${{ steps.filter.outputs.url }}
+      analytics: ${{ steps.filter.outputs.analytics }}
+      user: ${{ steps.filter.outputs.user }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters:  |
+            discovery: ['Backend/DiscoveryService/**']
+            security: ['Backend/SecurityService/**']
+            gateway: ['Backend/APIGateway/**']
+            kgs: ['Backend/KeyGeneration/**']
+            url: ['Backend/URLService/**']
+            analytics: ['Backend/AnalyticsService/**']
+            user: ['Backend/UserService/**']
+            frontend: ['Frontend/url-shortener-ui']
+
+  build-and-push:
+    needs: changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - { id: discovery, path: ./Backend/DiscoveryService, tag: url-discovery-service, run: "${{ needs.changes.outputs.discovery }}" }
+          - { id: security, path: ./Backend/SecurityService, tag: url-security-service, run: "${{ needs.changes.outputs.security }}" }
+          - { id: gateway, path: ./Backend/APIGateway, tag: url-apigateway-service, run: "${{ needs.changes.outputs.gateway }}" }
+          - { id: kgs, path: ./Backend/KeyGeneration, tag: url-key-generation, run: "${{ needs.changes.outputs.kgs }}" } 
+          - { id: url, path: ./Backend/URLService, tag: url-urlservice, run: "${{ needs.changes.outputs.url }}" }
+          - { id: user, path: ./Backend/UserService, tag: url-user-service, run: "${{ needs.changes.outputs.user }}" }
+          - { id: analytic, path: ./Backend/AnalyticsService, tag: url-analytics-service, run: "${{ needs.changes.outputs.user }}" }
+          - { id: frontend, path: ./Frontend/url-shortener-ui, tag: url-shortener-ui, run: "${{ needs.changes.outputs.frontend }}" }
+
+    steps:
+      - name: check for changes
+        if: matrix.run != 'true'
+        run: echo "No Changes for ${{ matrix.id }}, skiping..."
+      
+      - name: check code
+        if: matrix.run == 'true'
+        uses: actions/checkout@v4
+      
+      - name: set up JDK 17
+        if: matrix.run == 'true' && matrix.id != 'frontend'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribute: 'temurin'
+          cache: 'maven'
+      
+      - name: Log In to Docker Hub
+        if: matrix.run == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build All Jar's (Java only)
+        if: matrix.run == 'true' && matrix.id != 'frontend'
+        run: mvn clean package -DskipTests -T 1C -f ${{ matrix.path }}/pom.xml
+      
+      - name: Build and Push Image
+        if: matrix.run == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.path }}
+          push: true
+          tag: hemantbarole/${{ matrix.tag }}:latest

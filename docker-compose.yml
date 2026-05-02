@@ -1,0 +1,326 @@
+services:
+  discovery-service:
+    image: hemantbarole/url-discovery-service:latest
+    build: 
+      context: ./Backend/DiscoveryService
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_ACTIVE_PROFILES=docker
+      - SPRING_MAIN_LAZY_INITILIZATION=true
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    networks:
+      - url-shortener-net
+  
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - url-shortener-net
+  
+  security-service:
+    image: hemantbarole/url-security-service:latest
+    build: 
+      context: ./Backend/SecurityService
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "9099:9099"
+    environment:
+      - SPRING_ACTIVE_PROFILES=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - INTERNAL_SECRET=my-super-secret-key
+      - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      discovery-service:
+        condition: service_started
+    networks:
+      - url-shortener-net
+  
+  apigateway-service:
+    image: hemantbarole/url-apigateway-service:latest
+    build: 
+      context: ./Backend/APIGateway
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "9096:9096"
+    environment:
+      - SPRING_ACTIVE_PROFILES=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - APP_SECURITY_INTERNAL_HANDSHAKE_SECRET=my-super-secret-key
+      - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      discovery-service:
+        condition: service_started
+      security-service:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - url-shortener-net
+  
+  kgs-db:
+    image: mysql:8.0
+    container_name: kgs-db
+    environment:
+      - MYSQL_DATABASE=kgs_DB
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=kgsUser
+      - MYSQL_PASSWORD=kgsPass
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "3306:3306"
+    networks:
+      - url-shortener-net
+  
+  kgs:
+    image: hemantbarole/url-key-generation:latest
+    build: 
+      context: ./Backend/KeyGeneration
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "9097:9097"
+    environment:
+      - SPRING_ACTIVE_PROFILES=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://kgs-db:3306/kgs_DB
+      - SPRING_DATASOURCE_USERNAME=kgsUser
+      - SPRING_DATASOURCE_PASSWORD=kgsPass
+      - FLYWAY_ENBALE=true
+      - FLYWAY_BASELINE_ON_MIGRATE=true
+      - INTERNAL_SECRET=my-super-secret-key
+      - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      discovery-service:
+        condition: service_started
+    networks:
+      - url-shortener-net
+  
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - url-shortener-net
+  
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - url-shortener-net
+
+  url-db:
+    image: mongo:latest
+    container_name: url-db
+    environment:
+      MONGO_INITDB_DATABASE: url_DB
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: qwerty
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - url-shortener-net
+
+  url-service:
+    image: hemantbarole/url-urlservice:latest
+    build: 
+      context: ./Backend/URLService
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "9094:9094"
+    environment:
+      - SPRING_ACTIVE_PROFILES=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@url-db:27017/url_DB?authSource=admin
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - KAFKA_PRODUCER_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
+      - KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
+      - KAFKA_PRODUCER_PROPERTIES_SPRING_JSON_ADD_TYPE_HEADERS=false
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - INTERNAL_SECRET=my-super-secret-key
+      - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      discovery-service:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      url-db:
+        condition: service_healthy
+    networks:
+      - url-shortener-net
+  
+  user-db:
+    image: mysql:8.0
+    container_name: user-db
+    environment:
+      - MYSQL_DATABASE=userUrl_DB
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=authUser
+      - MYSQL_PASSWORD=authPass
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "3307:3306"
+    networks:
+      - url-shortener-net
+  
+  user-service:
+    image: hemantbarole/url-user-service:latest
+    build: 
+      context: ./Backend/UserService
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "9098:9098"
+    environment:
+      - SPRING_ACTIVE_PROFILES=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/userUrl_DB
+      - SPRING_DATASOURCE_USERNAME=authUser
+      - SPRING_DATASOURCE_PASSWORD=authPass
+      - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      discovery-service:
+        condition: service_started
+      user-db:
+        condition: service_healthy
+    networks:
+      - url-shortener-net
+
+  analytic-db:
+    image: mongo:latest
+    container_name: analytic-db
+    environment:
+      MONGO_INITDB_DATABASE: analytic_DB
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: qwerty
+    ports:
+      - "27018:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - url-shortener-net
+
+  analytics-service:
+    image: hemantbarole/url-analytics-service:latest
+    build: 
+      context: ./Backend/AnalyticsService
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "9091:9091"
+    environment:
+      - SPRING_ACTIVE_PROFILES=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@analytic-db:27017/analytic_DB?authSource=admin
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - KAFKA_CONSUMER_GROUP_ID=analytics-group
+      - KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
+      - KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
+      - KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
+      - KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_VALUE_DEFAULT_TYPE="com.tp.main.dto.ClickEvent"
+      - KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGE="*"
+      - INTERNAL_SECRET=my-super-secret-key
+      - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      discovery-service:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      analytic-db:
+        condition: service_healthy
+    networks:
+      - url-shortener-net
+
+  frontend:
+    image: hemantbarole/url-shortener-ui:latest
+    build: 
+      context: ./Frontend/url-shortener-ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+     - REACT_APP_API_BASE_URL=http://localhost:9096
+    depends_on:
+      apigateway-service:
+        condition: service_started
+    networks:
+      - url-shortener-net
+
+networks:
+  url-shortener-net:
+    driver: bridge
