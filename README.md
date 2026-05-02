@@ -129,9 +129,13 @@ npm run dev
   - Avoids duplication and centralizes authentication logic
 - **Why Rate Limiting?**
   - Protects system from abuse and ensures fair usage
-📸 Screenshots
 
-## UI screenshots here
+## 📸 Screenshots
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/home.jpeg?raw=true)
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/signup.jpeg?raw=true)
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/signin.jpeg?raw=true)
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/dashboard.jpeg?raw=true)
+![image alt](https://github.com/Hemant15-Bl/Url-Shortener/blob/main/analytics.jpeg?raw=true)
 
 ## 👨‍💻 Author
 Hemant Barole
