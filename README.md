@@ -3,58 +3,58 @@ SwiftLink is a production-grade, distributed URL shortening platform designed to
 Built using modern backend principles, this project demonstrates microservices architecture, event-driven design, caching, and rate limiting, similar to real-world systems.
 
 ## 🔥 Key Features
-**🔐 Centralized Authentication Service**
-  -- Dedicated Security Service for JWT validation across microservices
-  -- OAuth2 + JWT with HttpOnly cookies for enhanced security
-  -- Eliminates duplicated auth logic in downstream services
-**⚡ Scalable URL Shortening**
-  -- Distributed ID generation for unique short codes
-  -- Designed to avoid collisions across services
-**📊 Event-Driven Analytics**
-  -- Kafka-based architecture
-  -- URL Service → produces click events
-  -- Analytics Service → consumes and processes asynchronously
-**🚀 High Performance with Caching**
-  -- Redis caching for frequently accessed URLs
-  -- Reduces database load and improves response time
-**🛡 Rate Limiting**
+- **🔐 Centralized Authentication Service**
+- Dedicated Security Service for JWT validation across microservices
+- OAuth2 + JWT with HttpOnly cookies for enhanced security
+- Eliminates duplicated auth logic in downstream services
+- **⚡ Scalable URL Shortening**
+- Distributed ID generation for unique short codes
+- Designed to avoid collisions across services
+- **📊 Event-Driven Analytics**
+- Kafka-based architecture
+- URL Service → produces click events
+- Analytics Service → consumes and processes asynchronously
+- **🚀 High Performance with Caching**
+- Redis caching for frequently accessed URLs
+- Reduces database load and improves response time
+- **🛡 Rate Limiting**
   -- Token Bucket algorithm
   -- Configured at API Gateway: 10 req/sec (burst up to 20)
-**🌐 API Gateway (Reactive)**
+- **🌐 API Gateway (Reactive)**
   -- Built with Spring Cloud Gateway (WebFlux)
   -- Handles routing, authentication, and rate limiting
-**🔄 Service Discovery**
+- **🔄 Service Discovery**
   -- Eureka for dynamic service registration
 
 ## 🏗️ System Design
 ### Core Services
-**- API Gateway**
+- **API Gateway**
   -- Entry point for all requests
   -- Implements:
     -- JWT validation via Security Service
     -- Rate limiting
     -- Request routing
-**- Security Service**
+- **Security Service**
   -- Centralized authentication & token validation
   -- Shared across all services
-**- User Service**
+- **User Service**
   -- User registration and login
-**- URL Service**
+- **URL Service**
   -- Generates short URLs using distributed ID strategy
   -- Publishes events to Kafka
-**- Analytics Service**
+- **Analytics Service**
   -- Consumes Kafka events
   -- Processes click data asynchronously
-**- Service Registry (Eureka)**
+- **Service Registry (Eureka)**
   -- Enables service discovery and scaling
 
 ## ⚙️ Architecture Highlights
-**- Microservices + Event-Driven Design**
-**- Centralized Security Layer**
-**- Redis Caching for Low Latency**
-**- Kafka for Async Processing**
-**- Rate Limiting for Abuse Prevention**
-**- Stateless Services → Horizontal Scaling**
+- **Microservices + Event-Driven Design**
+- **Centralized Security Layer**
+- **Redis Caching for Low Latency**
+- **Kafka for Async Processing**
+- **Rate Limiting for Abuse Prevention**
+- **Stateless Services → Horizontal Scaling**
 
 ## 🛠️ Tech Stack
 - Backend
@@ -113,21 +113,21 @@ npm run dev
 ```
 
 ## 📈 Future Improvements
-**- Geo-based analytics**
-**- Custom aliases for URLs**
-**- Multi-region deployment**
-**- Circuit breakers (Resilience4j)**
-**- Kubernetes deployment**
+- Geo-based analytics
+- Custom aliases for URLs
+- Multi-region deployment
+- Circuit breakers (Resilience4j)
+- Kubernetes deployment
 
 ## 💡 Engineering Decisions
-**- Why Kafka?**
+- **Why Kafka?**
   - Decouples analytics from request lifecycle
   - Improves performance and reliability
-**- Why Redis?**
+- **Why Redis?**
   - Reduces DB hits for frequently accessed URLs
-**- Why Security Service?**
+- **Why Security Service?**
   - Avoids duplication and centralizes authentication logic
-**- Why Rate Limiting?**
+- **Why Rate Limiting?**
   - Protects system from abuse and ensures fair usage
 📸 Screenshots
 
