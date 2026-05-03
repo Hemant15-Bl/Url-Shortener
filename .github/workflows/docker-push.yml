@@ -44,7 +44,7 @@ jobs:
           - { id: kgs, path: ./Backend/KeyGeneration, tag: url-key-generation, run: "${{ needs.changes.outputs.kgs }}" } 
           - { id: url, path: ./Backend/URLService, tag: url-urlservice, run: "${{ needs.changes.outputs.url }}" }
           - { id: user, path: ./Backend/UserService, tag: url-user-service, run: "${{ needs.changes.outputs.user }}" }
-          - { id: analytic, path: ./Backend/AnalyticsService, tag: url-analytics-service, run: "${{ needs.changes.outputs.user }}" }
+          - { id: analytic, path: ./Backend/AnalyticsService, tag: url-analytics-service, run: "${{ needs.changes.outputs.analytics }}" }
           - { id: frontend, path: ./Frontend/url-shortener-ui, tag: url-shortener-ui, run: "${{ needs.changes.outputs.frontend }}" }
 
     steps:
