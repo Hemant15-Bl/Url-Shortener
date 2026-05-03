@@ -30,12 +30,13 @@ jobs:
             url: ['Backend/URLService/**']
             analytics: ['Backend/AnalyticsService/**']
             user: ['Backend/UserService/**']
-            frontend: ['Frontend/url-shortener-ui']
+            frontend: ['Frontend/url-shortener-ui/**']
 
   build-and-push:
     needs: changes
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - { id: discovery, path: ./Backend/DiscoveryService, tag: url-discovery-service, run: "${{ needs.changes.outputs.discovery }}" }
@@ -44,7 +45,7 @@ jobs:
           - { id: kgs, path: ./Backend/KeyGeneration, tag: url-key-generation, run: "${{ needs.changes.outputs.kgs }}" } 
           - { id: url, path: ./Backend/URLService, tag: url-urlservice, run: "${{ needs.changes.outputs.url }}" }
           - { id: user, path: ./Backend/UserService, tag: url-user-service, run: "${{ needs.changes.outputs.user }}" }
-          - { id: analytic, path: ./Backend/AnalyticsService, tag: url-analytics-service, run: "${{ needs.changes.outputs.analytics }}" }
+          - { id: analytics, path: ./Backend/AnalyticsService, tag: url-analytics-service, run: "${{ needs.changes.outputs.analytics }}" }
           - { id: frontend, path: ./Frontend/url-shortener-ui, tag: url-shortener-ui, run: "${{ needs.changes.outputs.frontend }}" }
 
     steps:
@@ -81,4 +82,4 @@ jobs:
         with:
           context: ${{ matrix.path }}
           push: true
-          tag: hemantbarole/${{ matrix.tag }}:latest
+          tag: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:latest
