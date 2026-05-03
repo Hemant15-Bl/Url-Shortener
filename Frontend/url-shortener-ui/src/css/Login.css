@@ -1,0 +1,53 @@
+.auth-wrapper {
+    background-image: radial-gradient(circle at 2px 2px, #e2e8f0 1px, transparent 0);
+    background-size: 40px 40px; /* Subtle dot pattern background */
+}
+
+.icon-badge {
+    width: 64px;
+    height: 64px;
+    background: #e0f2fe;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-control-lg {
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    border-color: #e2e8f0;
+}
+
+.form-control-lg:focus {
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
+    border-color: #38bdf8;
+}
+
+.btn-primary {
+    background-color: #0ea5e9;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0284c7;
+}
+
+.card {
+    border-radius: 20px;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+    border-color: #cbd5e1 !important;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
