@@ -82,4 +82,4 @@ jobs:
         with:
           context: ${{ matrix.path }}
           push: true
-          tag: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:latest
