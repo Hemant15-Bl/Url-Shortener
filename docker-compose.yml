@@ -11,7 +11,7 @@ services:
     ports:
       - "8761:8761"
     environment:
-      - SPRING_ACTIVE_PROFILES=docker
+      - spring_active_profiles=docker
       - SPRING_MAIN_LAZY_INITILIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     networks:
@@ -41,7 +41,7 @@ services:
     ports:
       - "9099:9099"
     environment:
-      - SPRING_ACTIVE_PROFILES=docker
+      - spring_active_profiles=docker
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
       - INTERNAL_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
@@ -64,7 +64,7 @@ services:
     ports:
       - "9096:9096"
     environment:
-      - SPRING_ACTIVE_PROFILES=docker
+      - spring_active_profiles=docker
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
       - APP_SECURITY_INTERNAL_HANDSHAKE_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
@@ -110,7 +110,7 @@ services:
     ports:
       - "9097:9097"
     environment:
-      - SPRING_ACTIVE_PROFILES=docker
+      - spring_active_profiles=docker
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
       - SPRING_DATASOURCE_URL=jdbc:mysql://kgs-db:3306/kgs_DB
       - SPRING_DATASOURCE_USERNAME=kgsUser
@@ -186,7 +186,7 @@ services:
     ports:
       - "9094:9094"
     environment:
-      - SPRING_ACTIVE_PROFILES=docker
+      - spring_active_profiles=docker
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
       - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@url-db:27017/url_DB?authSource=admin
       - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
@@ -241,7 +241,7 @@ services:
     ports:
       - "9098:9098"
     environment:
-      - SPRING_ACTIVE_PROFILES=docker
+      - spring_active_profiles=docker
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
       - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/userUrl_DB
       - SPRING_DATASOURCE_USERNAME=authUser
@@ -286,7 +286,7 @@ services:
     ports:
       - "9091:9091"
     environment:
-      - SPRING_ACTIVE_PROFILES=docker
+      - spring_active_profiles=docker
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
       - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@analytic-db:27017/analytic_DB?authSource=admin
       - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
