@@ -115,7 +115,9 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://kgs-db:3306/kgs_DB
       - SPRING_DATASOURCE_USERNAME=kgsUser
       - SPRING_DATASOURCE_PASSWORD=kgsPass
-      - FLYWAY_ENBALE=true
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - SPRING_JPA_HIBERNATE_DDR_AUTO=update
+      - FLYWAY_ENABLED=true
       - FLYWAY_BASELINE_ON_MIGRATE=true
       - INTERNAL_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
@@ -123,6 +125,8 @@ services:
     depends_on:
       discovery-service:
         condition: service_started
+      kgs-db:
+        condition: service_healthy
     networks:
       - url-shortener-net
   
@@ -246,6 +250,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/userUrl_DB
       - SPRING_DATASOURCE_USERNAME=authUser
       - SPRING_DATASOURCE_PASSWORD=authPass
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
