@@ -147,7 +147,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck:
-      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:29092", "--list"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -297,12 +297,12 @@ services:
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
-      discovery-service:
-        condition: service_started
       kafka:
         condition: service_healthy
       analytic-db:
         condition: service_healthy
+      discovery-service:
+        condition: service_started
     networks:
       - url-shortener-net
 
