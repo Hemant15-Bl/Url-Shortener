@@ -91,7 +91,8 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 60s
     ports:
       - "3306:3306"
     networks:
@@ -168,8 +169,8 @@ services:
       test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 20s
       timeout: 10s
-      retries: 5
-      start_period: 40s
+      retries: 10
+      start_period: 60s
     networks:
       - url-shortener-net
 
@@ -268,8 +269,8 @@ services:
       test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 20s
       timeout: 10s
-      retries: 5
-      start_period: 40s
+      retries: 10
+      start_period: 60s
     networks:
       - url-shortener-net
 
