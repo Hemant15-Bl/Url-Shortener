@@ -62,7 +62,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribute: 'temurin'
+          distribution: 'temurin'
           cache: 'maven'
       
       - name: Log In to Docker Hub
