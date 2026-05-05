@@ -22,7 +22,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Disabled for REST APIs
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll() // Registration & Login are public
+                .requestMatchers("/api/v1/auth/**", "/eureka/**", "/actuator/**").permitAll() // Registration & Login are public
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

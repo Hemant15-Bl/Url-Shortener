@@ -37,6 +37,15 @@ eureka:
 internal:
   secret: my-super-secret-key
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
 #logging:
 #  level:
 #    org.springframework.security: DEBUG

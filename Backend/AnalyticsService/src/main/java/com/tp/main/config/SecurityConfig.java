@@ -22,7 +22,8 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
-			.authorizeHttpRequests(auth -> auth.requestMatchers("/api/v3/analytics/**").authenticated()
+			.authorizeHttpRequests(auth -> auth.requestMatchers("/eureka/**", "/actuator/**").permitAll()
+												.requestMatchers("/api/v3/analytics/**").authenticated()
 											.anyRequest().authenticated()
 								).addFilterBefore(downstreamSecurityFilter, UsernamePasswordAuthenticationFilter.class);
 		

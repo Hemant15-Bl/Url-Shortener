@@ -56,7 +56,7 @@ public class GatewayConfig {
         return http
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless API
             .authorizeExchange(auth -> auth
-            		.pathMatchers("/login/**").permitAll()
+            		.pathMatchers("/login/**", "/actuator/**").permitAll()
             		.pathMatchers(endPoints).permitAll()
             		.anyExchange().authenticated()
             ).oauth2Login(oauth2 -> oauth2.authenticationSuccessHandler(this.oAuth2SuccessHandler))

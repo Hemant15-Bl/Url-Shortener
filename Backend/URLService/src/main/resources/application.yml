@@ -41,3 +41,12 @@ google:
 
 internal:
   secret: my-super-secret-key
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
