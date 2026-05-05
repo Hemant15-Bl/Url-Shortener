@@ -200,11 +200,11 @@ services:
     ports:
       - "27017:27017"
     healthcheck:
-      test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
-      interval: 20s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+      test: ["CMD", "mongosh", "--quiet", "mongodb://localhost:27017/admin", "--eval", "db.hello()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     networks:
       - url-shortener-net
 
@@ -313,11 +313,11 @@ services:
     ports:
       - "27018:27017"
     healthcheck:
-      test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
-      interval: 20s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+      test: ["CMD", "mongosh", "--quiet", "mongodb://localhost:27017/admin", "--eval", "db.hello()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     networks:
       - url-shortener-net
 
