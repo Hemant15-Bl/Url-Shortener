@@ -108,11 +108,11 @@ services:
       - MYSQL_USER=kgsUser
       - MYSQL_PASSWORD=kgsPass
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "kgsUser", "-p${MYSQL_PASSWORD}"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 60s
+      retries: 5
+      # start_period: 60s
     ports:
       - "3306:3306"
     networks:
@@ -193,6 +193,7 @@ services:
   url-db:
     image: mongo:latest
     container_name: url-db
+    command: mongod --bind_ip_all
     environment:
       MONGO_INITDB_DATABASE: url_DB
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -259,11 +260,11 @@ services:
       - MYSQL_USER=authUser
       - MYSQL_PASSWORD=authPass
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "authUser", "-p${MYSQL_PASSWORD}"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 60s
+      retries: 5
+      # start_period: 60s
     ports:
       - "3307:3306"
     networks:
@@ -306,6 +307,7 @@ services:
   analytic-db:
     image: mongo:latest
     container_name: analytic-db
+    command: mongod --bind_ip_all
     environment:
       MONGO_INITDB_DATABASE: analytic_DB
       MONGO_INITDB_ROOT_USERNAME: admin
