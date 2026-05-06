@@ -108,7 +108,7 @@ services:
       - MYSQL_USER=kgsUser
       - MYSQL_PASSWORD=kgsPass
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "kgsUser", "-p${MYSQL_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -201,9 +201,9 @@ services:
     ports:
       - "27017:27017"
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 20s
+      timeout: 10s
       retries: 5
       start_period: 40s
     networks:
@@ -260,7 +260,7 @@ services:
       - MYSQL_USER=authUser
       - MYSQL_PASSWORD=authPass
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "authUser", "-p${MYSQL_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -315,9 +315,9 @@ services:
     ports:
       - "27018:27017"
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 20s
+      timeout: 10s
       retries: 5
       start_period: 40s
     networks:
