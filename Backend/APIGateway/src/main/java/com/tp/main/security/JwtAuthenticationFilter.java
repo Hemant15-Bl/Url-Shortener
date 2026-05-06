@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 						
 						// Update the user's browser with the new Access Token
 				        exchange.getResponse().addCookie(ResponseCookie.from("AUTH_TOKEN", newAccessToken)
-				                .httpOnly(true).path("/").maxAge(900).build());
+				                .httpOnly(true).secure(true).path("/").maxAge(900).build());
 				                
 				        token = newAccessToken;
 					}

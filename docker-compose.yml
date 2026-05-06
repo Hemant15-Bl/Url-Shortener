@@ -12,6 +12,7 @@ services:
       - "8761:8761"
     environment:
       - spring_profiles_active=docker
+      - eureka_instance_hostname=discovery-service
       - SPRING_MAIN_LAZY_INITILIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
@@ -224,10 +225,10 @@ services:
       - spring_profiles_active=docker
       - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
       - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@url-db:27017/url_DB?authSource=admin
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - KAFKA_PRODUCER_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
-      - KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
-      - KAFKA_PRODUCER_PROPERTIES_SPRING_JSON_ADD_TYPE_HEADERS=false
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - SPRING_KAFKA_PRODUCER_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
+      - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
+      - SPRING_KAFKA_PRODUCER_PROPERTIES_SPRING_JSON_ADD_TYPE_HEADERS=false
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - INTERNAL_SECRET=my-super-secret-key
@@ -338,13 +339,13 @@ services:
       - spring_profiles_active=docker
       - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
       - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@analytic-db:27017/analytic_DB?authSource=admin
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - KAFKA_CONSUMER_GROUP_ID=analytics-group
-      - KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
-      - KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
-      - KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
-      - KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_VALUE_DEFAULT_TYPE="com.tp.main.dto.ClickEvent"
-      - KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGE="*"
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - SPRING_KAFKA_CONSUMER_GROUP_ID=analytics-group
+      - SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
+      - SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
+      - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_VALUE_DEFAULT_TYPE="com.tp.main.dto.ClickEvent"
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGE="*"
       - INTERNAL_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
