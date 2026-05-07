@@ -13,11 +13,10 @@ services:
       - "8761:8761"
     environment:
       - spring_profiles_active=docker
-      - eureka_instance_hostname=discovery-service
       - SPRING_MAIN_LAZY_INITILIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -153,11 +152,11 @@ services:
     volumes:
       - kgs-db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
-      # start_period: 60s
+      start_period: 60s
     networks:
       - url-shortener-net
   
@@ -189,7 +188,7 @@ services:
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
       kgs-db:
-        condition: service_healthy
+        condition: service_started
       redis:
         condition: service_healthy
       security-service:
@@ -220,11 +219,11 @@ services:
     volumes:
       - url-db-data:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"]
+      test: ["CMD", "mongosh", "--admin", "-u", "admin", "-p", "qwerty", "--eval", "db.adminCommand('ping')"]
       interval: 20s
       timeout: 10s
       retries: 5
-      # start_period: 40s
+      start_period: 60s
     networks:
       - url-shortener-net
 
@@ -258,7 +257,7 @@ services:
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
       url-db:
-        condition: service_healthy
+        condition: service_started
       redis:
         condition: service_healthy
       kafka:
@@ -290,11 +289,11 @@ services:
     volumes:
       - analytic-db-data:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"]
+      test: ["CMD", "mongosh", "--admin", "-u", "admin", "-p", "qwerty", "--eval", "db.adminCommand('ping')"]
       interval: 20s
       timeout: 10s
       retries: 5
-      # start_period: 40s
+      start_period: 60s
     networks:
       - url-shortener-net
 
@@ -335,7 +334,7 @@ services:
       start_period: 180s
     depends_on:
       analytic-db:
-        condition: service_healthy
+        condition: service_started
       kafka:
         condition: service_healthy
       security-service:
@@ -360,11 +359,11 @@ services:
     volumes:
       - user-db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
-      # start_period: 60s
+      start_period: 60s
     networks:
       - url-shortener-net
   
@@ -392,7 +391,7 @@ services:
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
       user-db:
-        condition: service_healthy
+        condition: service_started
       security-service:
         condition: service_healthy
       discovery-service:
