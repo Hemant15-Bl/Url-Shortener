@@ -1,4 +1,5 @@
 services:
+  # ---------------- 1. Infrastructure: Service-Registry ------------------------------
   discovery-service:
     image: hemantbarole/url-discovery-service:latest
     build: 
@@ -20,14 +21,17 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
-      start_period: 60s
+      start_period: 180s
     networks:
       - url-shortener-net
   
+  # ---------------- 2. Infrastructure: Redis (Pre-built image) ------------------------------
   redis:
     image: redis:alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -35,7 +39,39 @@ services:
       retries: 5
     networks:
       - url-shortener-net
+
+  # ---------------- 3. Infrastructure: Message Broker (Zookeeper + kafka) ------------------------------    
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - url-shortener-net
   
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "kafka:29092", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+    networks:
+      - url-shortener-net
+  
+  # ---------------- 4. Infrastructure: Normal JWT Authentication Flow ------------------------------
   security-service:
     image: hemantbarole/url-security-service:latest
     build: 
@@ -50,23 +86,25 @@ services:
     environment:
       - spring_profiles_active=docker
       - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
+
       - INTERNAL_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9099/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 180s
-    depends_on:
-      discovery-service:
-        condition: service_healthy
-      # redis:
-      #   condition: service_healthy
     networks:
       - url-shortener-net
-  
+
+  # ---------------- 5. Infrastructure: Core Service:- APIGateway-Service ------------------------------  
   apigateway-service:
     image: hemantbarole/url-apigateway-service:latest
     build: 
@@ -99,7 +137,9 @@ services:
         condition: service_healthy
     networks:
       - url-shortener-net
-  
+
+  # ---------------- 6. Business Logic: Other-Service ------------------------------    
+  # ---------------- Key-Generation-Service ------------------------------    
   kgs-db:
     image: mysql:8.0
     container_name: kgs-db
@@ -108,14 +148,16 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=kgsUser
       - MYSQL_PASSWORD=kgsPass
+    ports:
+      - "3306:3306"
+    volumes:
+      - kgs-db-data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
       # start_period: 60s
-    ports:
-      - "3306:3306"
     networks:
       - url-shortener-net
   
@@ -135,8 +177,8 @@ services:
       - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
 
       - SPRING_DATASOURCE_URL=jdbc:mysql://kgs-db:3306/kgs_DB
-      - SPRING_DATASOURCE_USERNAME=kgsUser
-      - SPRING_DATASOURCE_PASSWORD=kgsPass
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       
       - FLYWAY_ENABLED=true
@@ -145,68 +187,44 @@ services:
       
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      kgs-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      security-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9097/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 180s
-    depends_on:
-      discovery-service:
-        condition: service_healthy
-      kgs-db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     networks:
       - url-shortener-net
+# ------------------------ Key-Generation-Service End -----------------------------------
   
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - url-shortener-net
-  
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    healthcheck:
-      test: ["CMD", "kafka-topics", "--bootstrap-server", "kafka:29092", "--list"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 90s
-    networks:
-      - url-shortener-net
-
+  # ---------------- Url-Service ------------------------------    
   url-db:
     image: mongo:latest
     container_name: url-db
-    command: mongod --bind_ip_all
+    # command: mongod --bind_ip_all
     environment:
       MONGO_INITDB_DATABASE: url_DB
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: qwerty
     ports:
       - "27017:27017"
+    volumes:
+      - url-db-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD-SHELL", "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"]
       interval: 20s
       timeout: 10s
       retries: 5
-      start_period: 40s
+      # start_period: 40s
     networks:
       - url-shortener-net
 
@@ -224,24 +242,30 @@ services:
     environment:
       - spring_profiles_active=docker
       - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
+
+      - spring_data_redis_host=redis
+      - spring_data_redis_port=6379
+
       - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@url-db:27017/url_DB?authSource=admin
+
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
       - SPRING_KAFKA_PRODUCER_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
       - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
       - SPRING_KAFKA_PRODUCER_PROPERTIES_SPRING_JSON_ADD_TYPE_HEADERS=false
-      - SPRING_DATA_REDIS_HOST=redis
-      - SPRING_DATA_REDIS_PORT=6379
+
       - INTERNAL_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
-      discovery-service:
+      url-db:
         condition: service_healthy
       redis:
         condition: service_healthy
       kafka:
         condition: service_healthy
-      url-db:
+      security-service:
+        condition: service_healthy
+      discovery-service:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9094/actuator/health"]
@@ -251,7 +275,78 @@ services:
       start_period: 180s
     networks:
       - url-shortener-net
-  
+# ------------------------ Url-Service End -----------------------------------
+
+  analytic-db:
+    image: mongo:latest
+    container_name: analytic-db
+    # command: mongod --bind_ip_all
+    environment:
+      MONGO_INITDB_DATABASE: analytic_DB
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: qwerty
+    ports:
+      - "27018:27017"
+    volumes:
+      - analytic-db-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      # start_period: 40s
+    networks:
+      - url-shortener-net
+
+  # ---------------- Analytics-Service ------------------------------    
+  analytics-service:
+    image: hemantbarole/url-analytics-service:latest
+    build: 
+      context: ./Backend/AnalyticsService
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "9091:9091"
+    environment:
+      - spring_profiles_active=docker
+      - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
+
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@analytic-db:27017/analytic_DB?authSource=admin
+
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - SPRING_KAFKA_CONSUMER_GROUP_ID=analytics-group
+      - SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
+      - SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
+      - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_VALUE_DEFAULT_TYPE="com.tp.main.dto.ClickEvent"
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGE="*"
+
+      - INTERNAL_SECRET=my-super-secret-key
+      - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 180s
+    depends_on:
+      analytic-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      security-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+    networks:
+      - url-shortener-net
+# ------------------------ Analytic-Service End -----------------------------------
+
+  # ---------------- User-Service ------------------------------    
   user-db:
     image: mysql:8.0
     container_name: user-db
@@ -260,14 +355,16 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=authUser
       - MYSQL_PASSWORD=authPass
+    ports:
+      - "3307:3306"
+    volumes:
+      - user-db-data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
       # start_period: 60s
-    ports:
-      - "3307:3306"
     networks:
       - url-shortener-net
   
@@ -285,86 +382,32 @@ services:
     environment:
       - spring_profiles_active=docker
       - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
+
       - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/userUrl_DB
-      - SPRING_DATASOURCE_USERNAME=authUser
-      - SPRING_DATASOURCE_PASSWORD=authPass
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    depends_on:
+      user-db:
+        condition: service_healthy
+      security-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9098/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 180s
-    depends_on:
-      discovery-service:
-        condition: service_healthy
-      user-db:
-        condition: service_healthy
     networks:
       - url-shortener-net
+# ------------------------ User-Service End -----------------------------------
 
-  analytic-db:
-    image: mongo:latest
-    container_name: analytic-db
-    command: mongod --bind_ip_all
-    environment:
-      MONGO_INITDB_DATABASE: analytic_DB
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: qwerty
-    ports:
-      - "27018:27017"
-    healthcheck:
-      test: ["CMD", "mongosh", "--username", "admin", "--password", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
-      interval: 20s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-    networks:
-      - url-shortener-net
-
-  analytics-service:
-    image: hemantbarole/url-analytics-service:latest
-    build: 
-      context: ./Backend/AnalyticsService
-      dockerfile: Dockerfile
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-    ports:
-      - "9091:9091"
-    environment:
-      - spring_profiles_active=docker
-      - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
-      - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@analytic-db:27017/analytic_DB?authSource=admin
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - SPRING_KAFKA_CONSUMER_GROUP_ID=analytics-group
-      - SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
-      - SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
-      - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_VALUE_DEFAULT_TYPE="com.tp.main.dto.ClickEvent"
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGE="*"
-      - INTERNAL_SECRET=my-super-secret-key
-      - SPRING_MAIN_LAZY_INITIALIZATION=true
-      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9091/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 180s
-    depends_on:
-      kafka:
-        condition: service_healthy
-      analytic-db:
-        condition: service_healthy
-      discovery-service:
-        condition: service_healthy
-    networks:
-      - url-shortener-net
-
+  # ---------------- 7. Frontend: React Application------------------------------    
   frontend:
     image: hemantbarole/url-shortener-ui:latest
     build: 
@@ -379,6 +422,13 @@ services:
         condition: service_started
     networks:
       - url-shortener-net
+
+# ------------------ This tell docker to create persistent storage on host machine --------------------
+volumes:
+  user-db-data:
+  analytic-db-data:
+  url-db-data:
+  kgs-db-data:
 
 networks:
   url-shortener-net:
