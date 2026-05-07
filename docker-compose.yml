@@ -92,8 +92,8 @@ services:
     depends_on:
       discovery-service:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9099/actuator/health"]
       interval: 30s
@@ -190,7 +190,7 @@ services:
       kgs-db:
         condition: service_started
       redis:
-        condition: service_healthy
+        condition: service_started
       security-service:
         condition: service_healthy
       discovery-service:
@@ -282,14 +282,14 @@ services:
     # command: mongod --bind_ip_all
     environment:
       MONGO_INITDB_DATABASE: analytic_DB
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: qwerty
+      MONGO_INITDB_ROOT_USERNAME: adminAnal
+      MONGO_INITDB_ROOT_PASSWORD: qwertyPWD
     ports:
       - "27018:27017"
     volumes:
       - analytic-db-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--admin", "-u", "admin", "-p", "qwerty", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--admin", "-u", "adminAnal", "-p", "qwertyPWD", "--eval", "db.adminCommand('ping')"]
       interval: 20s
       timeout: 10s
       retries: 5
@@ -313,7 +313,7 @@ services:
       - spring_profiles_active=docker
       - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
 
-      - SPRING_DATA_MONGODB_URI=mongodb://admin:qwerty@analytic-db:27017/analytic_DB?authSource=admin
+      - SPRING_DATA_MONGODB_URI=mongodb://adminAnal:qwertyPWD@analytic-db:27017/analytic_DB?authSource=admin
 
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
       - SPRING_KAFKA_CONSUMER_GROUP_ID=analytics-group
