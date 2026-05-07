@@ -429,6 +429,7 @@ volumes:
   analytic-db-data:
   url-db-data:
   kgs-db-data:
+  redis-data:
 
 networks:
   url-shortener-net:
