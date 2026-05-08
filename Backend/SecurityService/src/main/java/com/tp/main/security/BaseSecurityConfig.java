@@ -1,5 +1,6 @@
 package com.tp.main.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +20,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class BaseSecurityConfig {
 
 	// Downstream services can override this bean if they have unique paths
-	private final DownstreamSecurityFilter downstreamSecurityFilter;
+	@Autowired
+	private  DownstreamSecurityFilter downstreamSecurityFilter;
 
-    public BaseSecurityConfig(DownstreamSecurityFilter downstreamSecurityFilter) {
-        this.downstreamSecurityFilter = downstreamSecurityFilter;
-    }
+//    public BaseSecurityConfig(DownstreamSecurityFilter downstreamSecurityFilter) {
+//        this.downstreamSecurityFilter = downstreamSecurityFilter;
+//    }
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, DefaultSecurityFilterChain filterChain) throws Exception {
@@ -33,7 +35,7 @@ public class BaseSecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/eureka/**")).permitAll()
                     .anyRequest().authenticated()
-                ).addFilterBefore(downstreamSecurityFilter, UsernamePasswordAuthenticationFilter.class)
+                ).addFilterBefore(this.downstreamSecurityFilter, UsernamePasswordAuthenticationFilter.class)
                    .build();
     }
 }
