@@ -1,5 +1,6 @@
 package com.tp.main.security;
 
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,6 +8,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableMethodSecurity
@@ -17,7 +19,8 @@ public class BaseSecurityConfig {
     @ConditionalOnMissingBean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
-                   .authorizeHttpRequests(auth -> auth.requestMatchers("/eureka/**", "/actuator/**").permitAll()
+                   .authorizeHttpRequests(auth -> auth.requestMatchers(EndpointRequest.to("health", "info")).permitAll()
+                		   								.requestMatchers(new AntPathRequestMatcher("/eureka/**")).permitAll()
                 		   								.anyRequest().authenticated())
                    .build();
     }
