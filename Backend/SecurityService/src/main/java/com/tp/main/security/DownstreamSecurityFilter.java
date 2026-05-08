@@ -22,6 +22,13 @@ public class DownstreamSecurityFilter extends OncePerRequestFilter {
 	private String internalSecret; // Inject from application.properties
 
 	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+	    String path = request.getServletPath();
+	    // Skip this filter for health checks and discovery
+	    return path.startsWith("/actuator") || path.startsWith("/eureka");
+	}
+	
+	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		String secret = request.getHeader("X-Internal-Secret");
