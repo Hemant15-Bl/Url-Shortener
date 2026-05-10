@@ -71,7 +71,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
-      start_period: 60s
+      start_period: 120s
     networks:
       - url-shortener-net
   
@@ -123,6 +123,10 @@ services:
     environment:
       - spring_profiles_active=docker
       - eureka_client_serviceUrl_defaultZone=http://discovery-service:8761/eureka/
+
+      - spring_data_redis_host=redis
+      - spring_data_redis_port=6379
+      
       - APP_SECURITY_INTERNAL_HANDSHAKE_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
@@ -224,7 +228,7 @@ services:
     volumes:
       - url-db-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--admin", "-u", "admin", "-p", "qwerty", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "-u", "admin", "-p", "qwerty", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 20s
       timeout: 10s
       retries: 5
@@ -294,7 +298,7 @@ services:
     volumes:
       - analytic-db-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--admin", "-u", "adminAnal", "-p", "qwertyPWD", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "-u", "adminAnal", "-p", "qwertyPWD", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 20s
       timeout: 10s
       retries: 5
