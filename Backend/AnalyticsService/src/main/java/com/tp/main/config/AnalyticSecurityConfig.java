@@ -11,9 +11,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.tp.main.security.DownstreamSecurityFilter;
 
+
+
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class AnalyticSecurityConfig {
 
 	@Autowired
 	private DownstreamSecurityFilter downstreamSecurityFilter;
