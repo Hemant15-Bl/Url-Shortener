@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,5 +53,12 @@ public class DownstreamSecurityFilter extends OncePerRequestFilter {
 				new ArrayList<>());
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
+	}
+	
+	@Bean
+	public FilterRegistrationBean<DownstreamSecurityFilter> registration(DownstreamSecurityFilter filter) {
+	    FilterRegistrationBean<DownstreamSecurityFilter> registration = new FilterRegistrationBean<>(filter);
+	    registration.setEnabled(false); // Stops it from running outside of Spring Security
+	    return registration;
 	}
 }

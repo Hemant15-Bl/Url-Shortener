@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,12 +24,18 @@ public class SecurityConfig {
 	
 	
 	@Bean
+	@Primary	// To Tell Spring boot to use this chain instead of the library or (Prioritizes this combined config over the library's base config)
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth.requestMatchers("/{shortCode}", "/eureka/**", "/actuator/**").permitAll()
 											.requestMatchers("/api/v2/url/**").authenticated()
 											.anyRequest().authenticated()
-								).addFilterBefore(downstreamSecurityFilter, UsernamePasswordAuthenticationFilter.class);
+								)
+			// 1. Handle OAuth2.O (Google)
+			.oauth2Login(oauth2 -> oauth2.redirectionEndpoint(redirect -> redirect.baseUri("/login/oauth2/code/*")))
+			// 2. Handle Custom JWT/Internal Secret
+			.addFilterBefore(downstreamSecurityFilter, UsernamePasswordAuthenticationFilter.class);
 		
 		return http.build();
 	}
