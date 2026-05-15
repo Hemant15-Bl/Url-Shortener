@@ -1,6 +1,5 @@
 package com.tp.main.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +21,7 @@ public class AnalyticSecurityConfig {
 
 	private final DownstreamSecurityFilter downstreamSecurityFilter;
 	
-	public AnalyticSecurityConfig(DownstreamSecurityFilter downstreamSecurityFilter) {
+	public AnalyticSecurityConfig(@Lazy DownstreamSecurityFilter downstreamSecurityFilter) {
         this.downstreamSecurityFilter = downstreamSecurityFilter;
     }
 	
