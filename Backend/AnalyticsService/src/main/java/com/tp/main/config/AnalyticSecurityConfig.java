@@ -22,7 +22,7 @@ public class AnalyticSecurityConfig {
 
 	private final DownstreamSecurityFilter downstreamSecurityFilter;
 	
-	public AnalyticSecurityConfig(@Lazy DownstreamSecurityFilter downstreamSecurityFilter) {
+	public AnalyticSecurityConfig(DownstreamSecurityFilter downstreamSecurityFilter) {
         this.downstreamSecurityFilter = downstreamSecurityFilter;
     }
 	
