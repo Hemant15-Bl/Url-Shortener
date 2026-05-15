@@ -55,10 +55,4 @@ public class DownstreamSecurityFilter extends OncePerRequestFilter {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 	
-	@Bean
-	public FilterRegistrationBean<DownstreamSecurityFilter> registration(DownstreamSecurityFilter filter) {
-	    FilterRegistrationBean<DownstreamSecurityFilter> registration = new FilterRegistrationBean<>(filter);
-	    registration.setEnabled(false); // Stops it from running outside of Spring Security
-	    return registration;
-	}
 }

@@ -1,8 +1,10 @@
 package com.tp.main.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,9 +20,18 @@ import com.tp.main.security.DownstreamSecurityFilter;
 @EnableWebSecurity
 public class AnalyticSecurityConfig {
 
-	@Autowired
-	private DownstreamSecurityFilter downstreamSecurityFilter;
+	private final DownstreamSecurityFilter downstreamSecurityFilter;
 	
+	public AnalyticSecurityConfig(@Lazy DownstreamSecurityFilter downstreamSecurityFilter) {
+        this.downstreamSecurityFilter = downstreamSecurityFilter;
+    }
+	
+	@Bean
+	public FilterRegistrationBean<DownstreamSecurityFilter> registration(DownstreamSecurityFilter filter) {
+	    FilterRegistrationBean<DownstreamSecurityFilter> registration = new FilterRegistrationBean<>(filter);
+	    registration.setEnabled(false); // Stops it from running outside of Spring Security
+	    return registration;
+	}
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
