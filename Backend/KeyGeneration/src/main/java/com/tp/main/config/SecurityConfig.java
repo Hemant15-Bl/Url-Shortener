@@ -40,7 +40,7 @@ public class SecurityConfig {
 											.anyRequest().authenticated()
 								)
 			//1. Handle OAuth2.O (Google)
-//			.oauth2Login(oauth2 -> oauth2.redirectionEndpoint(redirection -> redirection.baseUri("/lohin/oauth2/code/*")))
+			.oauth2Login(oauth2 -> oauth2.redirectionEndpoint(redirection -> redirection.baseUri("/login/oauth2/code/*")))
 			//2. Handle Custom JWT/Internal Secret
 			.addFilterBefore(downstreamSecurityFilter, UsernamePasswordAuthenticationFilter.class);
 		

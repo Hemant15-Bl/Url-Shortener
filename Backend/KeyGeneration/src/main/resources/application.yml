@@ -11,6 +11,13 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 200566460056-qlkqa2crgiottbur2dg8k5geq2fjn04q.apps.googleusercontent.com
+            client-secret: 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
 
 server:
   port: 9097

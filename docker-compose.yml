@@ -46,16 +46,17 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       KAFKA_OPTS: "-Xmx512M -Xms512M"
-      ZOOKEEPER_4LW_COMMANDS_WHITELIST: 'ruok, stat, srvr, mntr'
+      ZOOKEEPER_4LW_COMMANDS_WHITELIST: 'ruok'
     deploy:
       resources:
         limits:
           memory: 1G # Increase physical limit to 1GB
     healthcheck:
-      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/2181' || exit 1"]
+      test: ["CMD-SHELL", "echo 'ruok' | bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/2181' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 90s
     networks:
       - url-shortener-net
   
@@ -63,6 +64,8 @@ services:
     image: confluentinc/cp-kafka:7.5.0
     ports:
       - "9092:9092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -133,6 +136,9 @@ services:
 
       - spring_data_redis_host=redis
       - spring_data_redis_port=6379
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=200566460056-qlkqa2crgiottbur2dg8k5geq2fjn04q.apps.googleusercontent.com
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=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
       
       - APP_SECURITY_INTERNAL_HANDSHAKE_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
@@ -199,6 +205,9 @@ services:
       - FLYWAY_ENABLED=true
       - FLYWAY_BASELINE_ON_MIGRATE=true
       - INTERNAL_SECRET=my-super-secret-key
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=200566460056-qlkqa2crgiottbur2dg8k5geq2fjn04q.apps.googleusercontent.com
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=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
       
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
@@ -268,7 +277,10 @@ services:
       - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
       - SPRING_KAFKA_PRODUCER_PROPERTIES_SPRING_JSON_ADD_TYPE_HEADERS=false
 
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=200566460056-qlkqa2crgiottbur2dg8k5geq2fjn04q.apps.googleusercontent.com
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=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
       - INTERNAL_SECRET=my-super-secret-key
+
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
@@ -339,7 +351,10 @@ services:
       - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_VALUE_DEFAULT_TYPE="com.tp.main.dto.ClickEvent"
       - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGE="*"
 
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=200566460056-qlkqa2crgiottbur2dg8k5geq2fjn04q.apps.googleusercontent.com
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=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
       - INTERNAL_SECRET=my-super-secret-key
+      
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
@@ -445,6 +460,7 @@ volumes:
   url-db-data:
   kgs-db-data:
   redis-data:
+  kafka_data:
 
 networks:
   url-shortener-net:
