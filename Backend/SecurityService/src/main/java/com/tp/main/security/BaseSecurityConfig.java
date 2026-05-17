@@ -20,12 +20,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class BaseSecurityConfig {
 
 	// Downstream services can override this bean if they have unique paths
-	@Autowired
-	private  DownstreamSecurityFilter downstreamSecurityFilter;
-
-//    public BaseSecurityConfig(DownstreamSecurityFilter downstreamSecurityFilter) {
-//        this.downstreamSecurityFilter = downstreamSecurityFilter;
-//    }
+//	@Autowired
+//	private  DownstreamSecurityFilter downstreamSecurityFilter;
+	
+	private final DownstreamSecurityFilter downstreamSecurityFilter;
+	
+    public BaseSecurityConfig(DownstreamSecurityFilter downstreamSecurityFilter) {
+        this.downstreamSecurityFilter = downstreamSecurityFilter;
+    }
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
