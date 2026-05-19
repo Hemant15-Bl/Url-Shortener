@@ -74,7 +74,14 @@ jobs:
       
       - name: Build All Jar's (Java only)
         if: matrix.run == 'true' && matrix.id != 'frontend'
-        run: mvn clean package -DskipTests -T 1C -f ${{ matrix.path }}/pom.xml
+        run: |
+          # 1. Always install the shared library dependency to the local runner's .m2 cache
+          echo "Installing shared SecurityService library dependency..."
+          mvn clean install -DskipTests -f ./Backend/SecurityService/pom.xml
+          
+          # 2. Now build the targeted microservice matrix item cleanly
+          echo "Building target service: ${{ matrix.id }}..."
+          mvn clean package -DskipTests -f ${{ matrix.path }}/pom.xml
       
       - name: Build and Push Image
         if: matrix.run == 'true'
