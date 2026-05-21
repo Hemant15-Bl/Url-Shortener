@@ -9,6 +9,7 @@ spring:
         webflux:
           default-filters:
           - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+          - PreserveHostHeader
           routes:
           - id: url-shortener-route
             uri: lb://URL-SERVICE
@@ -77,6 +78,7 @@ spring:
 
 server:
   port: 9096
+  forward-headers-strategy: framework
 
 eureka:
   client:

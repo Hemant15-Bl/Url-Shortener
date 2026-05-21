@@ -32,6 +32,7 @@ spring:
   
 server:
   port: 9094
+  forward-headers-strategy: framework
 
 eureka:
   client:

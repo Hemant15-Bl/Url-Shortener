@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.tp.main.dto.ClickEvent;
 import com.tp.main.entities.UrlMapping;
@@ -46,7 +47,12 @@ public class UrlController {
     @PostMapping("/api/v2/url/shorten")
     public ResponseEntity<String> shorten(@RequestBody String originalUrl, HttpServletRequest request, @RequestHeader("X-User-Header") String username, @RequestParam(required = false) Integer daysValid) {
         String shortCode = urlService.createShortUrl(originalUrl, username,daysValid);
-        String domain = request.getRequestURL().toString().replace(request.getRequestURI(), "");
+//        String domain = request.getRequestURL().toString().replace(request.getRequestURI(), "");
+        String domain = ServletUriComponentsBuilder.fromContextPath(request)
+                .replacePath(null)
+                .replaceQuery(null)
+                .build()
+                .toUriString();
         return ResponseEntity.ok(domain+"/" + shortCode);
     }
 
