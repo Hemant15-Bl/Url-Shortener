@@ -58,6 +58,7 @@ const DashBoard = () => {
       setUrl('');
     } catch (err) {
       alert("Make sure URL-SERVICE is running on 9094!");
+      console.error("Shorturl Not Created:- ",err);
     } finally {
       setIsShortening(false);
     }

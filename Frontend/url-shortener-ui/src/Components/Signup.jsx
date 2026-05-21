@@ -36,6 +36,7 @@ const Signup = () => {
             window.location.href = '/login?registered=true';
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed. Username might be taken.');
+            console.error("User Not Register:- ",err);
         } finally {
             setLoading(false);
         }
