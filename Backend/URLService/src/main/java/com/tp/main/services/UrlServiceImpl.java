@@ -87,7 +87,8 @@ public class UrlServiceImpl {
         urlRepository.save(mapping);
         
         long ttlSeconds = (daysValid != null) ? daysValid * 86400L : 86400L; // Default 24h if permanent
-        redisTemplate.opsForValue().set(REDIS_PREFIX + shortCode, originalUrl, Duration.ofHours(ttlSeconds));
+        
+        redisTemplate.opsForValue().set(REDIS_PREFIX + shortCode, originalUrl, Duration.ofSeconds(ttlSeconds));
 
         return shortCode;
     }

@@ -45,14 +45,26 @@ public class UrlController {
 	
     // 1. Endpoint to Create Short URL
     @PostMapping("/api/v2/url/shorten")
-    public ResponseEntity<String> shorten(@RequestBody String originalUrl, HttpServletRequest request, @RequestHeader("X-User-Header") String username, @RequestParam(required = false) Integer daysValid) {
-        String shortCode = urlService.createShortUrl(originalUrl, username,daysValid);
+    public ResponseEntity<String> shorten(@RequestBody com.tp.main.dto.UrlRequest urlRequest, HttpServletRequest request, @RequestHeader("X-User-Header") String username, @RequestParam(required = false) Integer daysValid) {
+        
+    	// Clean string extraction
+    	String originalUrl = urlRequest.getOriginalUrl();
+    	
+    	// Execute business tier lookup safely
+    	String shortCode = urlService.createShortUrl(originalUrl, username,daysValid);
+    	
+    	// Exception-resilient domain configuration mapping
 //        String domain = request.getRequestURL().toString().replace(request.getRequestURI(), "");
-        String domain = ServletUriComponentsBuilder.fromContextPath(request)
-                .replacePath(null)
-                .replaceQuery(null)
-                .build()
-                .toUriString();
+    	String domain;
+    	try {
+    		domain = ServletUriComponentsBuilder.fromRequest(request)
+                    .replacePath(null)
+                    .replaceQuery(null)
+                    .build()
+                    .toUriString();
+		} catch (Exception e) {
+			domain = "http://localhost:9096";
+		}
         return ResponseEntity.ok(domain+"/" + shortCode);
     }
 
