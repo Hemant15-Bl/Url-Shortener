@@ -14,6 +14,7 @@ services:
     environment:
       - spring_profiles_active=docker
       - SPRING_MAIN_LAZY_INITILIZATION=true
+      - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
@@ -45,12 +46,12 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-      KAFKA_OPTS: "-Xmx512M -Xms512M"
+      KAFKA_OPTS: "-Xmx64M -Xms64M"
       ZOOKEEPER_4LW_COMMANDS_WHITELIST: 'ruok'
     deploy:
       resources:
         limits:
-          memory: 1G # Increase physical limit to 1GB
+          memory: 256M
     healthcheck:
       test: ["CMD-SHELL", "echo 'ruok' | bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/2181' || exit 1"]
       interval: 10s
@@ -73,11 +74,17 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OPTS: "-Xmx256M -Xms128M"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     depends_on:
       zookeeper:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "kafka-topics", "--bootstrap-server", "127.0.0.1:29092", "--list"]
+      # test: ["CMD", "kafka-topics", "--bootstrap-server", "127.0.0.1:29092", "--list"]
+      test: ["CMD-SHELL", "nc -z localhost 29092 || exit 1"] # Ultra-lightweight healthcheck that doesn't trigger a new Java process spike
       interval: 30s
       timeout: 10s
       retries: 10
@@ -103,6 +110,7 @@ services:
 
       - INTERNAL_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
       discovery-service:
@@ -142,6 +150,7 @@ services:
       
       - APP_SECURITY_INTERNAL_HANDSHAKE_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9096/actuator/health"]
@@ -210,6 +219,7 @@ services:
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=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
       
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
       kgs-db:
@@ -282,6 +292,7 @@ services:
       - INTERNAL_SECRET=my-super-secret-key
 
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
       url-db:
@@ -359,6 +370,7 @@ services:
       - INTERNAL_SECRET=my-super-secret-key
       
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9091/actuator/health"]
@@ -422,6 +434,7 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
       user-db:
