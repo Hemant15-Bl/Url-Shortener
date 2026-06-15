@@ -38,9 +38,9 @@ public class SecretInjectionFilter extends AbstractGatewayFilterFactory<SecretIn
             ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
 //                .header("X-Internal-Secret", "my-super-secret-key")
            		.header("X-Internal-Secret", internalSecret)
-                .header("X-User-Header", username)
+                .header("X-User-Header", userHeader)
                 .build();
-    		System.out.println("Debug - SecretInjectionFilter:- Username { "+username+" }");
+    		System.out.println("Debug - SecretInjectionFilter:- Username { "+userHeader+" }");
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
         };

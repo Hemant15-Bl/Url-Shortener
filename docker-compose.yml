@@ -14,6 +14,7 @@ services:
     environment:
       - spring_profiles_active=docker
       - SPRING_MAIN_LAZY_INITILIZATION=true
+      - EUREKA_SERVER_EVICTION_INTERVAL_TIMER_IN_MS=60000
       - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
@@ -110,6 +111,8 @@ services:
 
       - INTERNAL_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS=30     # Fetch every 30s instead of 5s
+      - EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS=15 # Heartbeat every 15s instead of 5s
       - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
@@ -150,6 +153,8 @@ services:
       
       - APP_SECURITY_INTERNAL_HANDSHAKE_SECRET=my-super-secret-key
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS=30     # Fetch every 30s instead of 5s
+      - EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS=15 # Heartbeat every 15s instead of 5s
       - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
@@ -219,6 +224,8 @@ services:
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=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
       
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS=30     # Fetch every 30s instead of 5s
+      - EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS=15 # Heartbeat every 15s instead of 5s
       - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
@@ -292,6 +299,8 @@ services:
       - INTERNAL_SECRET=my-super-secret-key
 
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS=30     # Fetch every 30s instead of 5s
+      - EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS=15 # Heartbeat every 15s instead of 5s
       - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
@@ -370,6 +379,8 @@ services:
       - INTERNAL_SECRET=my-super-secret-key
       
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS=30     # Fetch every 30s instead of 5s
+      - EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS=15 # Heartbeat every 15s instead of 5s
       - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     healthcheck:
@@ -434,6 +445,8 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
       - SPRING_MAIN_LAZY_INITIALIZATION=true
+      - EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS=30     # Fetch every 30s instead of 5s
+      - EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS=15 # Heartbeat every 15s instead of 5s
       - JAVA_OPTS=-Xms64m -Xmx128m
       - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     depends_on:
