@@ -64,9 +64,9 @@ public class UrlServiceImpl {
 
     public String createShortUrl(String originalUrl, String username, Integer daysValid) {
     	
-    	if (isUnsafe(originalUrl)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "URL is flagged as malicious!");
-        }
+//    	if (isUnsafe(originalUrl)) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "URL is flagged as malicious!");
+//        }
     	
         // 1. Get next unique long ID from our in-memory buffer
         long uniqueId = userBuffer.getNextId(username);
