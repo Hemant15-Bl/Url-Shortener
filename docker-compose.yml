@@ -156,7 +156,7 @@ services:
       - EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS=30     # Fetch every 30s instead of 5s
       - EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS=15 # Heartbeat every 15s instead of 5s
       - JAVA_OPTS=-Xms64m -Xmx128m
-      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      - JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Dio.netty.resolver.dns.defaultAddressTypes=IPV4_ONLY -Dsun.net.spi.nameservice.provider.1=dns,sun
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9096/actuator/health"]
       interval: 30s
