@@ -32,80 +32,81 @@ import jakarta.servlet.http.HttpServletRequest;
 public class UrlController {
 
 	@Autowired
-    private UrlServiceImpl urlService;
-	
+	private UrlServiceImpl urlService;
+
 	@Autowired
 	private KafkaTemplate<String, Object> kafkaTemplate;
-	
+
 	@Autowired
 	private AnalyticClient analyticClient;
 
 	@Autowired
 	private UrlRepository urlRepository;
-	
-    // 1. Endpoint to Create Short URL
-    @PostMapping("/api/v2/url/shorten")
-    public ResponseEntity<String> shorten(@RequestBody String originalUrl, HttpServletRequest request, @RequestHeader("X-User-Header") String username, @RequestParam(required = false) Integer daysValid) {
-    	
-    	// Execute business tier lookup safely
-    	String shortCode = urlService.createShortUrl(originalUrl, username,daysValid);
-    	
-    	// Exception-resilient domain configuration mapping
+
+	// 1. Endpoint to Create Short URL
+	@PostMapping("/api/v2/url/shorten")
+	public ResponseEntity<String> shorten(@RequestBody String originalUrl, HttpServletRequest request,
+			@RequestHeader("X-User-Header") String username, @RequestParam(required = false) Integer daysValid) {
+
+		// Execute business tier lookup safely
+		String shortCode = urlService.createShortUrl(originalUrl, username, daysValid);
+
+		// Exception-resilient domain configuration mapping
 //        String domain = request.getRequestURL().toString().replace(request.getRequestURI(), "");
-    	String domain;
-    	try {
-    		domain = ServletUriComponentsBuilder.fromRequest(request)
-                    .replacePath(null)
-                    .replaceQuery(null)
-                    .build()
-                    .toUriString();
+		String domain;
+		try {
+			domain = ServletUriComponentsBuilder.fromRequest(request).replacePath(null).replaceQuery(null).build()
+					.toUriString();
 		} catch (Exception e) {
 			domain = "http://localhost:9096";
 		}
-        return ResponseEntity.ok(domain+"/" + shortCode);
-    }
+		return ResponseEntity.ok(domain + "/" + shortCode);
+	}
 
-    // 2. Endpoint to Redirect (The "Magic")
-    @GetMapping("/{shortCode}")
-    public ResponseEntity<Void> redirect(@PathVariable String shortCode, HttpServletRequest request) {
-    	String userAgent = request.getHeader("User-Agent");
-    	String ipAddress = request.getRemoteAddr();
-    	
-    	ClickEvent event = new ClickEvent(shortCode, ipAddress, userAgent, LocalDateTime.now());
-    	
-        String originalUrl = urlService.resolveUrl(shortCode);
-        
-     // Safety check: Ensure the URL is redirect-ready
-        if (originalUrl != null && !originalUrl.startsWith("http")) {
-            originalUrl = "https://" + originalUrl;
-        }
-        
-     // Fire and forget: send to Kafka
-        kafkaTemplate.send("url-clicks", event);
-        
-        return ResponseEntity.status(HttpStatus.FOUND) // HTTP 302
-                .location(URI.create(originalUrl))
-                .build();
-    }
-    
-    @GetMapping("/my-links")
-    public ResponseEntity<List<UrlMapping>> getMyLinks(@RequestHeader("X-User-Header") String username) {
-        return ResponseEntity.ok(urlRepository.findByCreatedBy(username));
-    }
-    
-    @GetMapping("/api/v2/url/all")
-    public ResponseEntity<List<UrlMapping>> getAllLinks() {
-        return ResponseEntity.ok(urlRepository.findAll());
-    }
-    
-    @DeleteMapping("/api/v2/url/remove/{shortCode}")
-    public ResponseEntity<Void> deleteFullUrl(@PathVariable String shortCode) {
-        // 1. Delete from URL-Service's own Database
-        urlRepository.deleteByShortCode(shortCode);
+	// 2. Endpoint to Redirect (The "Magic")
+	@GetMapping("/{shortCode}")
+	public ResponseEntity<Void> redirect(@PathVariable String shortCode, HttpServletRequest request) {
+		String userAgent = request.getHeader("User-Agent");
+		String ipAddress = request.getRemoteAddr();
 
-        // 2. Call Analytic-Service to clean up stats and logs
-        analyticClient.removeAnalytics(shortCode);
+		ClickEvent event = new ClickEvent(shortCode, ipAddress, userAgent, LocalDateTime.now());
 
-        return ResponseEntity.noContent().build();
-    }
+		String originalUrl = urlService.resolveUrl(shortCode);
+
+		// Safety check: Ensure the URL is redirect-ready
+		if (originalUrl != null && !originalUrl.startsWith("http")) {
+			originalUrl = "https://" + originalUrl;
+		}
+
+		// Fire and forget: send to Kafka
+		kafkaTemplate.send("url-clicks", event).whenComplete((result, ex) -> {
+			if (ex != null) {
+				System.out.println("Kafka background error: " + ex.getMessage());
+			}
+		});
+
+		return ResponseEntity.status(HttpStatus.FOUND) // HTTP 302
+				.location(URI.create(originalUrl)).build();
+	}
+
+	@GetMapping("/my-links")
+	public ResponseEntity<List<UrlMapping>> getMyLinks(@RequestHeader("X-User-Header") String username) {
+		return ResponseEntity.ok(urlRepository.findByCreatedBy(username));
+	}
+
+	@GetMapping("/api/v2/url/all")
+	public ResponseEntity<List<UrlMapping>> getAllLinks() {
+		return ResponseEntity.ok(urlRepository.findAll());
+	}
+
+	@DeleteMapping("/api/v2/url/remove/{shortCode}")
+	public ResponseEntity<Void> deleteFullUrl(@PathVariable String shortCode) {
+		// 1. Delete from URL-Service's own Database
+		urlRepository.deleteByShortCode(shortCode);
+
+		// 2. Call Analytic-Service to clean up stats and logs
+		analyticClient.removeAnalytics(shortCode);
+
+		return ResponseEntity.noContent().build();
+	}
 }

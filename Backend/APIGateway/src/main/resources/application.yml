@@ -5,6 +5,11 @@ spring:
 
   cloud:
     gateway:
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 5s
+        ssl:
+          use-insecure-trust-manager: true
       server:
         webflux:
           default-filters:
@@ -52,13 +57,7 @@ spring:
             predicates:
             - Path=/api/v1/auth/**
 
-#          - id: user-private-route
-#            uri: lb://USER-SERVICE
-#            predicates:
-#            - Path=/api/v1/auth/**
-#            filters:
-#            - name: JwtAuthenticationFilter
-#            - name: SecretInjectionFilter
+
 
   data:
     redis:
@@ -85,7 +84,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://discovery-service:8761/eureka/
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}

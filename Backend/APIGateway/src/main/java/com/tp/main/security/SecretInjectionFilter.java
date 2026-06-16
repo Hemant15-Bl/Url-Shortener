@@ -21,7 +21,7 @@ public class SecretInjectionFilter extends AbstractGatewayFilterFactory<SecretIn
         	String username = (String) exchange.getAttributes().get("username");
         	
         	// Allow the request if it's a redirect, even if username is null
-            String path = exchange.getRequest().getPath().toString();
+            String path = exchange.getRequest().getPath().value();
             boolean isRedirect = path.matches("/[a-zA-Z0-9]+");
         	
         	// If username is null, handle the error (e.g., return 401)
