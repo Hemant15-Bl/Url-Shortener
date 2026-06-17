@@ -57,7 +57,7 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler{
 	private ResponseCookie createCookie(String name, String value, long maxAge) {
 		return ResponseCookie.from(name, value)
 				.httpOnly(true)		// Prevent JS access
-				.secure(true)		// when locally ('false') but in production ('true')
+				.secure(false)		// when locally ('false') but in production ('true')
 				.path("/")			// Available for all routes
 				.maxAge(maxAge)		// 24 Hour
 				.sameSite("Lax")	// Protection against CSRF
