@@ -20,7 +20,7 @@ const AnalyticsModal = ({ shortCode, onClose }) => {
         // Fetch Summary (Total clicks, etc.)
         const data = await loadLinkStats(shortCode);
 
-        // console.log("This data from 'LinkStats' Collection:",data);
+        console.log("This data from 'LinkStats' Collection:",data);
         
         // Transform the summary for the Chart (Assuming backend still calculates this or use a dummy)
         const chartData = data.chartData || [];
