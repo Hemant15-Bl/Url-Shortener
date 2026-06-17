@@ -1,5 +1,6 @@
 package com.tp.main.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -37,15 +38,23 @@ public class StatsController {
 	
 	@GetMapping("/{shortCode}")
 	public ResponseEntity<Map<String, Object>> getStats(@PathVariable String shortCode){
+		 Map<String, Object> response = new HashMap<>();
 		return linkStatRepo.findById(shortCode).map(stats -> {
-	        Map<String, Object> response = new HashMap<>();
+	       
 	        response.put("totalClick", stats.getTotalClick());
 	        response.put("lastClickAt", stats.getLastClickAt());
+	        
 	        // Fetch chart data on the fly from the Log collection
 	        List<Map> chartData = analyticService.getBrowserDistribution(shortCode);
 	        response.put("chartData", chartData);
+	        
 	        return ResponseEntity.ok(response);
-	    }).orElse(ResponseEntity.notFound().build());
+	    }).orElseGet(()-> {
+	    	response.put("totalClick", 0);
+            response.put("lastClickAt", null);
+            response.put("chartData", new ArrayList<>());
+            return ResponseEntity.ok(response);
+	    });
 	}
 	
 	@GetMapping("/my-links")
