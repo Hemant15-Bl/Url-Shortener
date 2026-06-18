@@ -42,12 +42,12 @@ public class AnalyticSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth.requestMatchers("/eureka/**", "/actuator/**").permitAll()
-												.requestMatchers("/api/v3/analytics/**").authenticated()
+			.authorizeHttpRequests(auth -> auth.requestMatchers("/eureka/**", "/actuator/**", "/api/v3/analytics/**").permitAll()
+//												.requestMatchers("/api/v3/analytics/**").authenticated()
 											.anyRequest().authenticated()
 								)
 			// 1. Handle OAuth2.O (Google)
-			.oauth2Login(oauth2 -> oauth2.redirectionEndpoint(redirect -> redirect.baseUri("/login/oauth2/code/*")))
+//			.oauth2Login(oauth2 -> oauth2.redirectionEndpoint(redirect -> redirect.baseUri("/login/oauth2/code/*")))
 			// 2. Handle Custom JWT/Internal Secret
 			.addFilterBefore(downstreamSecurityFilter, UsernamePasswordAuthenticationFilter.class);
 		
