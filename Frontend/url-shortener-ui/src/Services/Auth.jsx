@@ -18,25 +18,25 @@ const getCookie = (name) => {
     return null;
 };
 
-// ==========================================
-// REQUEST INTERCEPTOR FOR COOKIE AUTH
-// ==========================================
-axiosAPI.interceptors.request.use(
-    (config) => {
-        // 1. Try to read the AUTH_TOKEN directly from your cookies
-        const token = getCookie("AUTH_TOKEN"); 
+// // ==========================================
+// // REQUEST INTERCEPTOR FOR COOKIE AUTH
+// // ==========================================
+// axiosAPI.interceptors.request.use(
+//     (config) => {
+//         // 1. Try to read the AUTH_TOKEN directly from your cookies
+//         const token = getCookie("AUTH_TOKEN"); 
         
-        // 2. If your backend needs it as a header, inject it here
-        if (token) {
-            config.headers["Authorization"] = `Bearer ${token}`;
-        }
+//         // 2. If your backend needs it as a header, inject it here
+//         if (token) {
+//             config.headers["Authorization"] = `Bearer ${token}`;
+//         }
         
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+//         return config;
+//     },
+//     (error) => {
+//         return Promise.reject(error);
+//     }
+// );
 
 // ==========================================
 // RESPONSE INTERCEPTOR

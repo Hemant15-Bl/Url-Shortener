@@ -43,7 +43,6 @@ spring:
             filters:
             - name: JwtAuthenticationFilter
             - name: SecretInjectionFilter
-            - StripPrefix=3
 
           - id: kgs-route
             uri: lb://KEY-GENERATION
