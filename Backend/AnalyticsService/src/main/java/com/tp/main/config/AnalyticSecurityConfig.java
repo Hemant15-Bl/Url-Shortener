@@ -41,6 +41,7 @@ public class AnalyticSecurityConfig {
 	@Primary
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
+			.cors(cors -> cors.disable())
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth.requestMatchers("/eureka/**", "/actuator/**", "/api/v3/analytics/**").permitAll()
 //												.requestMatchers("/api/v3/analytics/**").authenticated()
