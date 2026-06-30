@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-service
+  namespace: default
+  labels:
+    app: url-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: url-service
+  template:
+    metadata:
+      labels:
+        app: url-service
+    spec:
+      containers:
+        - name: url-service
+          image: hemantbarole/url-urlservice:latest
+          ports:
+            - containerPort: 9094
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://discovery-service:8761/eureka/
+
+            - name: SPRING_DATA_REDIS_HOST
+              value: redis
+            - name: SPRING_DATA_REDIS_PORT
+              value: "6379"
+
+            - name: SPRING_DATA_MONGODB_URI
+              value: mongodb://admin:qwerty@url-db:27017/url_DB?authSource=admin
+
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: SPRING_KAFKA_PRODUCER_KEY_SERIALIZER
+              value: org.apache.kafka.common.serialization.StringSerializer
+            - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
+              value: org.springframework.kafka.support.serializer.JsonSerializer
+            - name: SPRING_KAFKA_PRODUCER_PROPERTIES_SPRING_JSON_ADD_TYPE_HEADERS
+              value: "false"
+
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID
+              value: 200566460056-qlkqa2crgiottbur2dg8k5geq2fjn04q.apps.googleusercontent.com
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET
+              value: 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
+            - name: INTERNAL_SECRET
+              value: my-super-secret-key
+
+            - name: SPRING_LAZY_INITIALIZATION
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS
+              value: "30"
+            - name: EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS
+              value: "15"
+            - name: JAVA_OPTS
+              value: "-Xms64m -Xmx128m"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+          resources:
+            limits:
+              memory: "320Mi"
+              cpu: "400m"
+            requests:
+              memory: "180Mi"
+              cpu: "50m"
+          # STARTUP PROBE: Gives your app up to 2 minutes to boot on your 8GB laptop
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9094
+            failureThreshold: 24
+            periodSeconds: 5
+
+          # LIVENESS PROBE: Runs continuously after startup passes
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9094
+            periodSeconds: 10
+            timeoutSeconds: 2
+          
+          # READINESS PROBE: Controls traffic routing
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 9094
+            periodSeconds: 10
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-service
+  namespace: default
+spec:
+  selector:
+    app: url-service
+  ports:
+    - protocol: TCP
+      port: 9094
+      targetPort: 9094
+  type: ClusterIP

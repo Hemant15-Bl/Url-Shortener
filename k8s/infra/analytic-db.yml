@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: analytic-db-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytic-db
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: analytic-db
+  template:
+    metadata:
+      labels:
+        app: analytic-db
+    spec:
+      containers:
+        - name: analytic-db
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: analytic_DB
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: adminAnal
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: qwertyPWD
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "300m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+          # NATIVE MONGO HEALTH CHECK
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          volumeMounts:
+            - name: analytic-db-storage
+              mountPath: /data/db
+      volumes:
+        - name: analytic-db-storage
+          persistentVolumeClaim:
+            claimName: analytic-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytic-db
+  namespace: default
+spec:
+  selector:
+    app: analytic-db
+  ports:
+    - protocol: TCP
+      port: 27018
+      targetPort: 27017
+  type: ClusterIP

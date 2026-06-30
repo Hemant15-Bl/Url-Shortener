@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: url-db-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-db
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: url-db
+  template:
+    metadata:
+      labels:
+        app: url-db
+    spec:
+      containers:
+        - name: url-db
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: url_DB
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: admin
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: qwerty
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "300m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+          # NATIVE MONGO HEALTH CHECK
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          volumeMounts:
+            - name: url-db-storage
+              mountPath: /data/db
+      volumes:
+        - name: url-db-storage
+          persistentVolumeClaim:
+            claimName: url-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-db
+  namespace: default
+spec:
+  selector:
+    app: url-db
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP

@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kgs-db-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kgs-db
+  namespace: default
+  labels:
+    app: kgs-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kgs-db
+  template:
+    metadata:
+      labels:
+        app: kgs-db
+    spec:
+      containers:
+        - name: kgs-db
+          image: mysql:8.0
+          args:
+            - "--innodb-flush-log-at-trx-commit=0" # 💡 Huge speedup: Don't flush to disk every second
+            - "--innodb-doublewrite=0"            # 💡 Bypasses double buffer writes (safe for local dev)
+            - "--innodb-buffer-pool-size=48M"     # 💡 Forces InnoDB engine to stay tiny
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              value: kgs_DB
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_USER
+              value: kgsUser
+            - name: MYSQL_PASSWORD
+              value: kgsPass
+          resources:
+            limits:
+              memory: "384Mi"
+              cpu: "400m"
+            requests:
+              memory: "256Mi"
+              cpu: "150m"
+          # NATIVE MYSQL HEALTH CHECK
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -proot
+            initialDelaySeconds: 30 # Gives it runway to clear the init stage
+            periodSeconds: 15
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -proot
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          volumeMounts:
+            - name: kgs-db-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: kgs-db-storage
+          persistentVolumeClaim:
+            claimName: kgs-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kgs-db
+  namespace: default
+spec:
+  selector:
+    app: kgs-db
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP

@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: default
+  labels:
+    app: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: hemantbarole/url-user-service:latest
+          ports:
+            - containerPort: 9098
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://discovery-service:8761/eureka/
+
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://user-db:3306/userUrl_DB
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.MySQL8Dialect
+
+            - name: SPRING_LAZY_INITIALIZATION
+              value: "true"
+            - name: EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS
+              value: "30"
+            - name: EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS
+              value: "15"
+            - name: JAVA_OPTS
+              value: "-Xms64m -Xmx128m"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+          resources:
+            limits:
+              memory: "320Mi"
+              cpu: "400m"
+            requests:
+              memory: "180Mi"
+              cpu: "50m"
+          # STARTUP PROBE: Gives your app up to 2 minutes to boot on your 8GB laptop
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9098
+            failureThreshold: 24
+            periodSeconds: 5
+
+          # LIVENESS PROBE: Runs continuously after startup passes
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9098
+            periodSeconds: 10
+            timeoutSeconds: 2
+          
+          # READINESS PROBE: Controls traffic routing
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 9098
+            periodSeconds: 10
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: default
+spec:
+  selector:
+    app: user-service
+  ports:
+    - protocol: TCP
+      port: 9098
+      targetPort: 9098
+  type: ClusterIP

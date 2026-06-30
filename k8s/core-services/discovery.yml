@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discovery-service
+  namespace: default
+  labels:
+    app: discovery-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discovery-service
+  template:
+    metadata:
+      labels:
+        app: discovery-service
+    spec:
+      containers:
+        - name: discovery-service
+          image: hemantbarole/url-discovery-service:latest
+          ports:
+            - containerPort: 8761
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: SPRING_LAZY_INITIALIZATION
+              value: "false"
+          resources:
+            limits:
+              memory: "384Mi"
+              cpu: "500m"
+            requests:
+              memory: "200Mi"
+              cpu: "60m"
+          # STARTUP PROBE: Gives your app up to 2 minutes to boot on your 8GB laptop
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8761
+            failureThreshold: 24
+            periodSeconds: 5
+
+          # LIVENESS PROBE: Runs continuously after startup passes
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8761
+            periodSeconds: 10
+            timeoutSeconds: 2
+          
+          # READINESS PROBE: Controls traffic routing
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8761
+            periodSeconds: 10
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discovery-service
+  namespace: default
+spec:
+  selector:
+    app: discovery-service
+  ports:
+    - protocol: TCP
+      port: 8761
+      targetPort: 8761
+  type: ClusterIP
