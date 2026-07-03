@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: analytic-db-pvc
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -15,6 +17,8 @@ kind: Deployment
 metadata:
   name: analytic-db
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: 1
   selector:

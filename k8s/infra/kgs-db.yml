@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: kgs-db-pvc
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -17,6 +19,8 @@ metadata:
   namespace: default
   labels:
     app: kgs-db
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: 1
   selector:

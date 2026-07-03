@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: kafka-pvc
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -17,6 +19,8 @@ metadata:
   namespace: default
   labels:
     app: kafka
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: 1
   selector:
