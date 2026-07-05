@@ -32,6 +32,8 @@ spec:
       containers:
         - name: url-db
           image: mongo:latest
+          args:
+            - "--wiredTigerCacheSizeGB=0.15" # Restricts internal engine memory cache to ~150MB
           ports:
             - containerPort: 27017
           env:
@@ -50,15 +52,23 @@ spec:
               cpu: "50m"
           # NATIVE MONGO HEALTH CHECK
           livenessProbe:
-            tcpSocket:
-              port: 27017
-            initialDelaySeconds: 10
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand({ ping: 1 })"
+            initialDelaySeconds: 30
             periodSeconds: 15
+            timeoutSeconds: 5
           readinessProbe:
-            tcpSocket:
-              port: 27017
-            initialDelaySeconds: 5
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand({ ping: 1 })"
+            initialDelaySeconds: 15
             periodSeconds: 15
+            timeoutSeconds: 5
           volumeMounts:
             - name: url-db-storage
               mountPath: /data/db
