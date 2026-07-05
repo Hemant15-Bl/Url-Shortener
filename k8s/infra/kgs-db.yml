@@ -20,7 +20,7 @@ metadata:
   labels:
     app: kgs-db
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   replicas: 1
   selector:
