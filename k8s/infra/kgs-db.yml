@@ -38,6 +38,9 @@ spec:
             - "--innodb-flush-log-at-trx-commit=0" # 💡 Huge speedup: Don't flush to disk every second
             - "--innodb-doublewrite=0"            # 💡 Bypasses double buffer writes (safe for local dev)
             - "--innodb-buffer-pool-size=48M"     # 💡 Forces InnoDB engine to stay tiny
+            - "--innodb-log-buffer-size=16M"
+            - "--max-connections=20"
+            - "--key-buffer-size=8M"
           ports:
             - containerPort: 3306
           env:
@@ -63,7 +66,7 @@ spec:
                 - mysqladmin
                 - ping
                 - -proot
-            initialDelaySeconds: 30 # Gives it runway to clear the init stage
+            initialDelaySeconds: 60 # Gives it runway to clear the init stage
             periodSeconds: 15
           readinessProbe:
             exec:
@@ -71,7 +74,7 @@ spec:
                 - mysqladmin
                 - ping
                 - -proot
-            initialDelaySeconds: 30
+            initialDelaySeconds: 45
             periodSeconds: 15
           volumeMounts:
             - name: kgs-db-storage
