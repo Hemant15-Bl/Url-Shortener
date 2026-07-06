@@ -38,6 +38,7 @@ spec:
           image: apache/kafka:3.7.0
           ports:
             - containerPort: 9092
+            - containerPort: 9093 # Explicitly expose controller port internally
           env:
             # Kraft mode configuration
             - name: KAFKA_NODE_ID
@@ -45,7 +46,7 @@ spec:
             - name: KAFKA_PROCESS_ROLES
               value: "broker,controller"
             - name: KAFKA_CONTROLLER_QUORUM_VOTERS
-              value: "1@127.0.0.1:9093"
+              value: "1@localhost:9093"
             - name: KAFKA_CONTROLLER_LISTENER_NAMES
               value: "CONTROLLER"
 
@@ -71,21 +72,21 @@ spec:
               value: "MkU3OEVBNTcwNTg0NDM0Rk"
           resources:
             limits:
-              memory: "384Mi"
+              memory: "512Mi"
               cpu: "400m"
             requests:
-              memory: "128Mi"
+              memory: "256Mi"
               cpu: "100m"
           # EFFICIENT NETWORK HEALTH CHECK
           livenessProbe:
             tcpSocket:
               port: 9092
-            initialDelaySeconds: 30 # Gives Kafka time to connect to Zookeeper
+            initialDelaySeconds: 45 # Increased slightly for KRaft initialization overhead
             periodSeconds: 15
           readinessProbe:
             tcpSocket:
               port: 9092
-            initialDelaySeconds: 30
+            initialDelaySeconds: 45
             periodSeconds: 15
           # 1. Mount the volume inside the container path
           volumeMounts:
