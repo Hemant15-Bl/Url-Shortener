@@ -33,7 +33,7 @@ spec:
         - name: analytic-db
           image: mongo:latest
           args:
-            - "--wiredTigerCacheSizeGB=0.15" # Restricts internal engine memory cache to ~150MB
+            - "--wiredTigerCacheSizeGB=0.25" # Increased to Mongo's hard minimum floor
           ports:
             - containerPort: 27017
           env:
@@ -45,10 +45,10 @@ spec:
               value: qwertyPWD
           resources:
             limits:
-              memory: "256Mi"
+              memory: "512Mi"
               cpu: "300m"
             requests:
-              memory: "128Mi"
+              memory: "300Mi"
               cpu: "50m"
           # NATIVE MONGO HEALTH CHECK
           livenessProbe:
