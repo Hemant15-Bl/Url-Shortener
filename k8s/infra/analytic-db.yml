@@ -52,23 +52,29 @@ spec:
               cpu: "50m"
           # NATIVE MONGO HEALTH CHECK
           livenessProbe:
+            tcpSocket:
+              port: 27017
             exec:
               command:
                 - mongosh
                 - --eval
                 - "db.adminCommand({ ping: 1 })"
-            initialDelaySeconds: 30
-            periodSeconds: 15
-            timeoutSeconds: 5
+            initialDelaySeconds: 45
+            periodSeconds: 20
+            timeoutSeconds: 15
+            failureThreshold: 3
           readinessProbe:
+            tcpSocket:
+              port: 27017
             exec:
               command:
                 - mongosh
                 - --eval
                 - "db.adminCommand({ ping: 1 })"
-            initialDelaySeconds: 15
-            periodSeconds: 15
-            timeoutSeconds: 5
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 15
+            failureThreshold: 3
           volumeMounts:
             - name: analytic-db-storage
               mountPath: /data/db
