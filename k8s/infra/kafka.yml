@@ -72,22 +72,26 @@ spec:
               value: "MkU3OEVBNTcwNTg0NDM0Rk"
           resources:
             limits:
-              memory: "512Mi"
-              cpu: "400m"
+              memory: "640Mi"
+              cpu: "600m"
             requests:
-              memory: "256Mi"
-              cpu: "100m"
+              memory: "384Mi"
+              cpu: "200m"
           # EFFICIENT NETWORK HEALTH CHECK
           livenessProbe:
             tcpSocket:
               port: 9092
-            initialDelaySeconds: 45 # Increased slightly for KRaft initialization overhead
-            periodSeconds: 15
+            initialDelaySeconds: 60 # Increased slightly for KRaft initialization overhead
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 4
           readinessProbe:
             tcpSocket:
               port: 9092
-            initialDelaySeconds: 45
-            periodSeconds: 15
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 4
           # 1. Mount the volume inside the container path
           volumeMounts:
             - name: kafka-storage
