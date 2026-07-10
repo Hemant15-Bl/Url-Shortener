@@ -59,7 +59,7 @@ spec:
                 - mongosh
                 - --eval
                 - "db.adminCommand({ ping: 1 })"
-            initialDelaySeconds: 45
+            initialDelaySeconds: 60
             periodSeconds: 20
             timeoutSeconds: 5
             failureThreshold: 3
@@ -71,7 +71,7 @@ spec:
                 - mongosh
                 - --eval
                 - "db.adminCommand({ ping: 1 })"
-            initialDelaySeconds: 20
+            initialDelaySeconds: 40
             periodSeconds: 20
             timeoutSeconds: 5
             failureThreshold: 3
