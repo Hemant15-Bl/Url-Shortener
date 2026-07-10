@@ -48,12 +48,12 @@ spec:
               memory: "512Mi"  # Increased to give ~256Mi headspace above the WT cache
               cpu: "300m"
             requests:
-              memory: "300Mi" # Bumped up to safely cover the initial 0.25GB cache startup
+              memory: "256Mi" # Bumped up to safely cover the initial 0.25GB cache startup
               cpu: "50m"
           # NATIVE MONGO HEALTH CHECK
           livenessProbe:
-            # tcpSocket:
-            #   port: 27017
+            tcpSocket:
+              port: 27017
             exec:
               command:
                 - mongosh
@@ -61,11 +61,11 @@ spec:
                 - "db.adminCommand({ ping: 1 })"
             initialDelaySeconds: 45
             periodSeconds: 20
-            timeoutSeconds: 15
+            timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
-            # tcpSocket:
-            #   port: 27017
+            tcpSocket:
+              port: 27017
             exec:
               command:
                 - mongosh
@@ -73,7 +73,7 @@ spec:
                 - "db.adminCommand({ ping: 1 })"
             initialDelaySeconds: 20
             periodSeconds: 20
-            timeoutSeconds: 15
+            timeoutSeconds: 5
             failureThreshold: 3
           volumeMounts:
             - name: url-db-storage
