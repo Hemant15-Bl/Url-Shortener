@@ -18,7 +18,7 @@ metadata:
   name: analytic-db
   namespace: default
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   replicas: 1
   selector:
@@ -45,11 +45,11 @@ spec:
               value: qwertyPWD
           resources:
             limits:
-              memory: "512Mi"
-              cpu: "300m"
+              memory: "64Mi"
+              cpu: "20m"
             requests:
-              memory: "256Mi"
-              cpu: "50m"
+              memory: "384Mi"
+              cpu: "300m"
           # NATIVE MONGO HEALTH CHECK
           livenessProbe:
             tcpSocket:

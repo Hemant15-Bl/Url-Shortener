@@ -20,7 +20,7 @@ metadata:
   labels:
     app: kgs-db
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   replicas: 1
   selector:
@@ -54,11 +54,11 @@ spec:
               value: kgsPass
           resources:
             limits:
-              memory: "384Mi"
-              cpu: "400m"
+              memory: "64Mi"
+              cpu: "20m"
             requests:
-              memory: "256Mi"
-              cpu: "150m"
+              memory: "384Mi"
+              cpu: "300m"
           # NATIVE MYSQL HEALTH CHECK
           livenessProbe:
             exec:

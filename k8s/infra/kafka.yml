@@ -72,11 +72,11 @@ spec:
               value: "MkU3OEVBNTcwNTg0NDM0Rk"
           resources:
             limits:
-              memory: "640Mi"
-              cpu: "600m"
-            requests:
               memory: "384Mi"
               cpu: "200m"
+            requests:
+              memory: "640Mi"
+              cpu: "600m"
           # EFFICIENT NETWORK HEALTH CHECK
           livenessProbe:
             tcpSocket:

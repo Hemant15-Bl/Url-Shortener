@@ -24,11 +24,11 @@ spec:
             - containerPort: 6379
           resources:
             limits:
-              memory: "256Mi"
-              cpu: "200m"
+              memory: "64Mi"
+              cpu: "20m"
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: "384Mi"
+              cpu: "300m"
           # NATIVE REDIS HEALTH CHECK (No Actuator!)
           livenessProbe:
             exec:

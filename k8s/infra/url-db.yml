@@ -45,11 +45,11 @@ spec:
               value: qwerty
           resources:
             limits:
-              memory: "512Mi"  # Increased to give ~256Mi headspace above the WT cache
-              cpu: "300m"
+              memory: "64Mi"  # Increased to give ~256Mi headspace above the WT cache
+              cpu: "20m"
             requests:
-              memory: "256Mi" # Bumped up to safely cover the initial 0.25GB cache startup
-              cpu: "50m"
+              memory: "384Mi" # Bumped up to safely cover the initial 0.25GB cache startup
+              cpu: "300m"
           # NATIVE MONGO HEALTH CHECK
           livenessProbe:
             tcpSocket:
