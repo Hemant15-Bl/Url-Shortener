@@ -6,7 +6,7 @@ metadata:
   labels:
     app: redis
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   replicas: 1
   selector:
@@ -25,10 +25,10 @@ spec:
           resources:
             limits:
               memory: "64Mi"
-              cpu: "20m"
+              cpu: "50m"
             requests:
-              memory: "384Mi"
-              cpu: "300m"
+              memory: "128Mi"
+              cpu: "100m"
           # NATIVE REDIS HEALTH CHECK (No Actuator!)
           livenessProbe:
             tcpSocket:

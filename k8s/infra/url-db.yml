@@ -18,7 +18,7 @@ metadata:
   name: url-db
   namespace: default
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   replicas: 1
   selector:
@@ -45,8 +45,8 @@ spec:
               value: qwerty
           resources:
             limits:
-              memory: "64Mi"  # Increased to give ~256Mi headspace above the WT cache
-              cpu: "20m"
+              memory: "256Mi"  # Increased to give ~256Mi headspace above the WT cache
+              cpu: "100m"
             requests:
               memory: "384Mi" # Bumped up to safely cover the initial 0.25GB cache startup
               cpu: "300m"

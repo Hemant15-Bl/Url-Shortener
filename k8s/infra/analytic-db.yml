@@ -18,7 +18,7 @@ metadata:
   name: analytic-db
   namespace: default
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   replicas: 1
   selector:
@@ -45,8 +45,8 @@ spec:
               value: qwertyPWD
           resources:
             limits:
-              memory: "64Mi"
-              cpu: "20m"
+              memory: "256Mi"
+              cpu: "100m"
             requests:
               memory: "384Mi"
               cpu: "300m"
