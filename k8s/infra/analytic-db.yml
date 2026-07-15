@@ -52,8 +52,6 @@ spec:
               cpu: "300m"
           # NATIVE MONGO HEALTH CHECK
           livenessProbe:
-            tcpSocket:
-              port: 27017
             exec:
               command:
                 - mongosh
@@ -64,8 +62,6 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
-            tcpSocket:
-              port: 27017
             exec:
               command:
                 - mongosh
