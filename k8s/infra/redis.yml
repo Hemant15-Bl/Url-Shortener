@@ -23,10 +23,10 @@ spec:
           ports:
             - containerPort: 6379
           resources:
-            limits:
+            requests:
               memory: "64Mi"
               cpu: "50m"
-            requests:
+            limits:
               memory: "128Mi"
               cpu: "100m"
           # NATIVE REDIS HEALTH CHECK (No Actuator!)

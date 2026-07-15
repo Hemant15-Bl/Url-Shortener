@@ -44,11 +44,11 @@ spec:
             - name: MONGO_INITDB_ROOT_PASSWORD
               value: qwerty
           resources:
-            limits:
-              memory: "256Mi"  # Increased to give ~256Mi headspace above the WT cache
-              cpu: "100m"
             requests:
-              memory: "384Mi" # Bumped up to safely cover the initial 0.25GB cache startup
+              memory: "192Mi"
+              cpu: "100m"
+            limits:
+              memory: "384Mi"
               cpu: "300m"
           # NATIVE MONGO HEALTH CHECK
           livenessProbe:

@@ -71,10 +71,10 @@ spec:
             - name: CLUSTER_ID
               value: "MkU3OEVBNTcwNTg0NDM0Rk"
           resources:
-            limits:
+            requests:
               memory: "384Mi"
               cpu: "200m"
-            requests:
+            limits:
               memory: "512Mi"
               cpu: "500m"
           # EFFICIENT NETWORK HEALTH CHECK

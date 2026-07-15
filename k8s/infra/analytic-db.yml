@@ -44,10 +44,10 @@ spec:
             - name: MONGO_INITDB_ROOT_PASSWORD
               value: qwertyPWD
           resources:
-            limits:
-              memory: "256Mi"
-              cpu: "100m"
             requests:
+              memory: "192Mi"
+              cpu: "100m"
+            limits:
               memory: "384Mi"
               cpu: "300m"
           # NATIVE MONGO HEALTH CHECK
