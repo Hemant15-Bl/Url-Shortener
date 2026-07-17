@@ -5,6 +5,9 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -35,18 +38,21 @@ jobs:
   build-and-push:
     needs: changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
+      max-parallel: 1   # ← forces matrix jobs to run sequentially, avoiding push races
       matrix:
         include:
-          - { id: discovery, path: ./Backend/DiscoveryService, tag: url-discovery-service, run: "${{ needs.changes.outputs.discovery }}" }
-          - { id: security, path: ./Backend/SecurityService, tag: url-security-service, run: "${{ needs.changes.outputs.security }}" }
-          - { id: gateway, path: ./Backend/APIGateway, tag: url-apigateway-service, run: "${{ needs.changes.outputs.gateway }}" }
-          - { id: kgs, path: ./Backend/KeyGeneration, tag: url-key-generation, run: "${{ needs.changes.outputs.kgs }}" } 
-          - { id: url, path: ./Backend/URLService, tag: url-urlservice, run: "${{ needs.changes.outputs.url }}" }
-          - { id: user, path: ./Backend/UserService, tag: url-user-service, run: "${{ needs.changes.outputs.user }}" }
-          - { id: analytics, path: ./Backend/AnalyticsService, tag: url-analytics-service, run: "${{ needs.changes.outputs.analytics }}" }
-          - { id: frontend, path: ./Frontend/url-shortener-ui, tag: url-shortener-ui, run: "${{ needs.changes.outputs.frontend }}" }
+          - { id: discovery, path: ./Backend/DiscoveryService, tag: url-discovery-service, manifest: k8s/core-services/discovery.yml, run: "${{ needs.changes.outputs.discovery }}" }
+          - { id: security, path: ./Backend/SecurityService, tag: url-security-service, manifest: k8s/core-services/security.yml, run: "${{ needs.changes.outputs.security }}" }
+          - { id: gateway, path: ./Backend/APIGateway, tag: url-apigateway-service, manifest: k8s/core-services/apigateway.yml, run: "${{ needs.changes.outputs.gateway }}" }
+          - { id: kgs, path: ./Backend/KeyGeneration, tag: url-key-generation, manifest: k8s/core-services/kgs.yml, run: "${{ needs.changes.outputs.kgs }}" } 
+          - { id: url, path: ./Backend/URLService, tag: url-urlservice, manifest: k8s/core-services/url.yml, run: "${{ needs.changes.outputs.url }}" }
+          - { id: user, path: ./Backend/UserService, tag: url-user-service, manifest: k8s/core-services/user.yml, run: "${{ needs.changes.outputs.user }}" }
+          - { id: analytics, path: ./Backend/AnalyticsService, tag: url-analytics-service, manifest: k8s/core-services/analytics.yml, run: "${{ needs.changes.outputs.analytics }}" }
+          - { id: frontend, path: ./Frontend/url-shortener-ui, tag: url-shortener-ui, manifest: k8s/core-services/frontend.yml, run: "${{ needs.changes.outputs.frontend }}" }
 
     steps:
       - name: check for changes
@@ -56,6 +62,8 @@ jobs:
       - name: check code
         if: matrix.run == 'true'
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: set up JDK 17
         if: matrix.run == 'true' && matrix.id != 'frontend'
@@ -82,6 +90,11 @@ jobs:
           # 2. Now build the targeted microservice matrix item cleanly
           echo "Building target service: ${{ matrix.id }}..."
           mvn clean package -DskipTests -f ${{ matrix.path }}/pom.xml
+
+      - name: Set image tag
+        if: matrix.run == 'true'
+        id: vars
+        run: echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
       
       - name: Build and Push Image
         if: matrix.run == 'true'
@@ -89,4 +102,21 @@ jobs:
         with:
           context: ${{ matrix.path }}
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:${{ steps.vars.outputs.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:latest
+      
+      - name: Update manifest with new image tag
+        if: matrix.run == 'true'
+        run: |
+          sed -i "s|image: .*${{ matrix.tag }}:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:${{ steps.vars.outputs.sha }}|" ${{ matrix.manifest }}
+
+      - name: Commit and push manifest change
+        if: matrix.run == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ${{ matrix.manifest }}
+          git diff --staged --quiet || git commit -m "chore: deploy ${{ matrix.id }} @ ${{ steps.vars.outputs.sha }} [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
