@@ -102,6 +102,8 @@ jobs:
         with:
           context: ${{ matrix.path }}
           push: true
+          build-args: |
+            REACT_APP_API_BASE_URL=http://localhost:30096
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:${{ steps.vars.outputs.sha }}
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.tag }}:latest
