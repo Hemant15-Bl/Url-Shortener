@@ -1,4 +1,3 @@
-import axios from "axios";
 import { axiosAPI, myAxios } from "./Auth";
 
 export const loadUserByAuth = async () => {

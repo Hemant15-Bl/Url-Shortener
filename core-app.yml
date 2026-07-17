@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: core-services
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/Hemant15-Bl/Url-Shortener.git' # <-- repo URL
+    targetRevision: main
+    path: k8s/core-services # <-- The folder ArgoCD will watch
+  destination:
+    server: 'https://kubernetes.default.svc' # Deploys directly to your running cluster
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true     # Automatically deletes resources in k8s if you delete them from Git
+      selfHeal: true  # Automatically fixes changes if someone manually tampers with kubectl

@@ -11,7 +11,7 @@ export const getAllLinkes = async () => {
 
 export const createShortenerLink = async (url) => {
     try {
-        const resp = await axiosAPI.post('http://localhost:9096/api/v2/url/shorten', url, {
+        const resp = await axiosAPI.post('/api/v2/url/shorten', url, {
         headers: { 'Content-Type': 'text/plain' }
       });
         return resp.data;
@@ -22,7 +22,7 @@ export const createShortenerLink = async (url) => {
 
 export const removeShortLink = async (shortCode) => {
     try {
-        await axiosAPI.delete(`http://localhost:9096/api/v2/url/remove/${shortCode}`);
+        await axiosAPI.delete(`/api/v2/url/remove/${shortCode}`);
     } catch (err) {
         throw err;
     }

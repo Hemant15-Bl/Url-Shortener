@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { axiosAPI } from '../Services/Auth';
+import React, { useContext, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import { loadUserByAuth } from '../Services/User-service';
 import UserContext from '../context/UserContext';
