@@ -5,6 +5,8 @@ metadata:
   namespace: default
   labels:
     app: discovery-service
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   replicas: 1
   selector:
@@ -17,7 +19,8 @@ spec:
     spec:
       containers:
         - name: discovery-service
-          image: hemantbarole/url-discovery-service:latest
+          image: hemantbarole/url-discovery-service:REPLACE_ME
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8761
           env:
@@ -25,19 +28,21 @@ spec:
               value: prod
             - name: SPRING_LAZY_INITIALIZATION
               value: "false"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xms64m -Xmx160m -XX:+UseSerialGC -Xss512k -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
           resources:
-            limits:
-              memory: "384Mi"
-              cpu: "500m"
             requests:
-              memory: "200Mi"
-              cpu: "60m"
+              memory: "180Mi"
+              cpu: "50m"
+            limits:
+              memory: "320Mi"
+              cpu: "300m"
           # STARTUP PROBE: Gives your app up to 2 minutes to boot on your 8GB laptop
           startupProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8761
-            failureThreshold: 24
+            failureThreshold: 30
             periodSeconds: 5
 
           # LIVENESS PROBE: Runs continuously after startup passes
@@ -61,6 +66,8 @@ kind: Service
 metadata:
   name: discovery-service
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   selector:
     app: discovery-service

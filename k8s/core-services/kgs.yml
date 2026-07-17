@@ -5,6 +5,8 @@ metadata:
   namespace: default
   labels:
     app: kgs
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: 1
   selector:
@@ -17,7 +19,8 @@ spec:
     spec:
       containers:
         - name: kgs
-          image: hemantbarole/url-key-generation:latest
+          image: hemantbarole/url-key-generation:REPLACE_ME
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9097
           env:
@@ -55,23 +58,22 @@ spec:
               value: "30"
             - name: EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS
               value: "15"
-            - name: JAVA_OPTS
-              value: "-Xms64m -Xmx128m"
+            
             - name: JAVA_TOOL_OPTIONS
-              value: "-XX:+UseSerialGC -Xss512k -XX:MaxRAMPercentage=75.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+              value: "-Xms64m -Xmx160m -XX:+UseSerialGC -Xss512k -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
           resources:
-            limits:
-              memory: "320Mi"
-              cpu: "400m"
             requests:
-              memory: "180Mi"
-              cpu: "50m"
+              memory: "150Mi"
+              cpu: "40m"
+            limits:
+              memory: "280Mi"
+              cpu: "250m"
           # STARTUP PROBE: Gives your app up to 2 minutes to boot on your 8GB laptop
           startupProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 9097
-            failureThreshold: 24
+            failureThreshold: 30
             periodSeconds: 5
 
           # LIVENESS PROBE: Runs continuously after startup passes
@@ -95,6 +97,8 @@ kind: Service
 metadata:
   name: kgs
   namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   selector:
     app: kgs
