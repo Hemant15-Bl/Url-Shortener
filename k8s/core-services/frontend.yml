@@ -19,8 +19,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: hemantbarole/url-shortener-ui:REPLACE_ME
-          imagePullPolicy: IfNotPresent
+          image: hemantbarole/url-shortener-ui:4ebf766
           ports:
             - containerPort: 80
           # env:
