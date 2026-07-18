@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: discovery-service
-          image: hemantbarole/url-discovery-service:REPLACE_ME
+          image: hemantbarole/url-discovery-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8761

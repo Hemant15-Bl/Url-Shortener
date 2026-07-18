@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: security-service
-          image: hemantbarole/url-security-service:REPLACE_ME
+          image: hemantbarole/url-security-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9099

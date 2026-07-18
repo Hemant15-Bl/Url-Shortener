@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: analytics-service
-          image: hemantbarole/url-analytics-service:REPLACE_ME
+          image: hemantbarole/url-analytics-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9091

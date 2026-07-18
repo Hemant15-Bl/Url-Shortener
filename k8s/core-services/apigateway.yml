@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: apigateway-service
-          image: hemantbarole/url-apigateway-service:REPLACE_ME
+          image: hemantbarole/url-apigateway-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9096

@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: url-service
-          image: hemantbarole/url-urlservice:REPLACE_ME
+          image: hemantbarole/url-urlservice:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9094
