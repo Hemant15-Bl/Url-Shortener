@@ -17,6 +17,10 @@ spec:
       labels:
         app: discovery-service
     spec:
+      initContainers:
+        - name: wait-for-kafka
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z -w2 kafka 9092; do echo waiting for kafka; sleep 3; done']
       containers:
         - name: discovery-service
           image: hemantbarole/url-discovery-service:latest

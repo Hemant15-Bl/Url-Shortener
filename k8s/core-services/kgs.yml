@@ -17,6 +17,13 @@ spec:
       labels:
         app: kgs
     spec:
+      initContainers:
+        - name: wait-for-discovery
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z -w2 discovery-service 8761; do echo waiting for discovery-service; sleep 3; done']
+        - name: wait-for-kgs-db
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z -w2 kgs-db 3306; do echo waiting for kgs-db; sleep 3; done']
       containers:
         - name: kgs
           image: hemantbarole/url-key-generation:latest

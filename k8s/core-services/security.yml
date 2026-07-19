@@ -17,6 +17,10 @@ spec:
       labels:
         app: security-service
     spec:
+      initContainers:
+        - name: wait-for-discovery
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z -w2 discovery-service 8761; do echo waiting for discovery-service; sleep 3; done']
       containers:
         - name: security-service
           image: hemantbarole/url-security-service:latest
