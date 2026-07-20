@@ -39,9 +39,9 @@ spec:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:mysql://user-db:3306/userUrl_DB
             - name: SPRING_DATASOURCE_USERNAME
-              value: root
+              value: authUser
             - name: SPRING_DATASOURCE_PASSWORD
-              value: root
+              value: authPass
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
             - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT

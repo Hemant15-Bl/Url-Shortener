@@ -39,9 +39,9 @@ spec:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:mysql://kgs-db:3306/kgs_DB
             - name: SPRING_DATASOURCE_USERNAME
-              value: root
+              value: kgsUser
             - name: SPRING_DATASOURCE_PASSWORD
-              value: root
+              value: kgsPass
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
             - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
