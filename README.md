@@ -1,6 +1,17 @@
 # 🚀 SwiftLink — Distributed URL Shortener Platform
+
+![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x%20%7C%204.x-6DB33F?logo=springboot&logoColor=white)
+![Spring AI](https://img.shields.io/badge/Spring%20AI-2.0-6DB33F?logo=spring&logoColor=white)
+![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+
 SwiftLink is a production-grade, distributed URL shortening platform designed to handle high traffic, ensure secure authentication, and process analytics asynchronously at scale.
 Built using modern backend principles, this project demonstrates microservices architecture, event-driven design, caching, and rate limiting, similar to real-world systems.
+
+<p align="center">
+  <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/home.jpeg?raw=true" alt="Url Shortener landing page" width="85%">
+</p>
 
 ## 🔥 Key Features
 - **🔐 Centralized Authentication Service**
@@ -71,6 +82,26 @@ Built using modern backend principles, this project demonstrates microservices a
 - Context API
 - Lucide Icons
 - Sonner / SweetAlert2
+
+## Architecture
+
+```mermaid
+graph LR
+    Browser["Browser"] --> UI["React UI :3000"]
+    UI --> GW["API Gateway Layer(Spring Cloud Gateway)"
+              "A. Authentication Filter" "B. Request Rate Limiter(Toket Bucket Algorithm)"]
+
+    GW --> Eureka["EUREKA SERVER(Service Discovery)"]
+    GW Eureka --> USER["USER-SERVICE :(Authentication/JWT)"]
+    GW --> URL["URL-SERVICE :(Link Resolution)"]
+    GW --> ANALYTIC["ANALYTICS-SERVICE :(Event Processing)"]
+
+    GW USER --> REDIS["REDIS-SERVER(State & Caching)"]
+    URL ANALYTIC["KAFKA CLUSTER:(Async Messaging)"]
+    USER --> USER DB["Auth-DB"]
+    URL --> URL DB["Link Data"]
+    ANALYTIC --> ANALYTIC DB["Click Log"]
+```
 
 ## 📁 Project Structure
 ```Text
