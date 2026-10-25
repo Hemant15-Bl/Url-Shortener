@@ -17,74 +17,15 @@ Built using modern backend principles, this project demonstrates microservices a
 
 ---
 
-## 🔥 Key Features
-- **🔐 Centralized Authentication Service**
-  - Dedicated Security Service for JWT validation across microservices
-  - OAuth2 + JWT with HttpOnly cookies for enhanced security
-  - Eliminates duplicated auth logic in downstream services
-- **⚡ Scalable URL Shortening**
-  - Distributed ID generation for unique short codes
-  - Designed to avoid collisions across services
-- **📊 Event-Driven Analytics**
-  - Kafka-based architecture
-  - URL Service → produces click events
-  - Analytics Service → consumes and processes asynchronously
-- **🚀 High Performance with Caching**
-  - Redis caching for frequently accessed URLs
-  - Reduces database load and improves response time
-- **🛡 Rate Limiting**
-  - Token Bucket algorithm
-  - Configured at API Gateway: 10 req/sec (burst up to 20)
-- **🌐 API Gateway (Reactive)**
-  - Built with Spring Cloud Gateway (WebFlux)
-  - Handles routing, authentication, and rate limiting
-- **🔄 Service Discovery**
-  - Eureka for dynamic service registration
+## Key Features
 
----
-
-## 🏗️ System Design
-### Core Services
-- **API Gateway**
-  - Entry point for all requests
-  - Implements:
-    - JWT validation via Security Service
-    - Rate limiting
-    - Request routing
-- **Security Service**
-  - Centralized authentication & token validation
-  - Shared across all services
-- **User Service**
-  - User registration and login
-- **URL Service**
-  - Generates short URLs using distributed ID strategy
-  - Publishes events to Kafka
-- **Analytics Service**
-  - Consumes Kafka events
-  - Processes click data asynchronously
-- **Service Registry (Eureka)**
-  - Enables service discovery and scaling
-
-## ⚙️ Architecture Highlights
-- **Microservices + Event-Driven Design**
-- **Centralized Security Layer**
-- **Redis Caching for Low Latency**
-- **Kafka for Async Processing**
-- **Rate Limiting for Abuse Prevention**
-- **Stateless Services → Horizontal Scaling**
-
----
-
-## 🛠️ Tech Stack
-
-| Category | Technologies |
-|---|---|
-| Backend | Java 17, Spring Boot 3.x , Maven |
-| Microservices | Spring Cloud: Eureka, Gateway (reactive), OpenFeign |
-| Security | Spring Security, OAuth2.O, Authentication/JWT |
-| Frontend | React, Axios, React Router, Bootstrap (reactstrap), Sonner / SweetAlert2, Lucide Icons |
-| Databases | MySQL (users, url) , MongoDB (analytics), Redis (rate limiting, url cached) |
-| DevOps | Docker, Docker Compose, Docker Hub images |
+- **Centralized authentication:** a dedicated Security Service validates JWTs (OAuth2 + JWT in HttpOnly cookies), so downstream services don't duplicate auth logic.
+- **Scalable URL shortening:** a distributed ID strategy generates unique short codes without collisions across service instances.
+- **Event-driven analytics:** the URL Service publishes click events to Kafka, and the Analytics Service consumes and stores them asynchronously.
+- **Redis caching:** frequently accessed URLs are cached (TTL 1 hour) to reduce database load and latency.
+- **Rate limiting:** a token bucket at the gateway allows 10 requests/sec with bursts up to 20.
+- **Reactive API Gateway:** Spring Cloud Gateway (WebFlux) handles routing, authentication, and rate limiting.
+- **Service discovery:** Eureka provides dynamic registration, so services can scale horizontally.
 
 ---
 
@@ -92,62 +33,61 @@ Built using modern backend principles, this project demonstrates microservices a
 
 ```mermaid
 graph TB
-    %% 1. Traffic ingress
     Browser["Browser"] --> UI["React UI :3000"]
-    JMeter["50 Concurrent Users<br/>(JMeter)"]
+    JMeter["JMeter<br/>50 concurrent users"]
 
-    %% 2. API Gateway
     subgraph GWL["API Gateway Layer (Spring Cloud Gateway)"]
         AUTH["A. Authentication Filter"]
-        RL["B. Request Rate Limiter<br/>(Token Bucket Algorithm)"]
+        RL["B. Request Rate Limiter<br/>(Token Bucket)"]
         AUTH --> RL
     end
     UI --> AUTH
     JMeter --> AUTH
 
-    %% 3. Control & caching plane
     subgraph CCP["Control & Caching Plane"]
         EUREKA["Eureka Server<br/>(Service Discovery)"]
-        USER["User-Service<br/>(Authentication / JWT)"]
-        REDIS[("Redis Server<br/>State & Caching<br/>Token Bucket: R=10, B=20<br/>URL Cache: TTL 1hr")]
+        SEC["Security Service<br/>(JWT Validation)"]
+        USER["User Service<br/>(Registration / Login)"]
+        REDIS[("Redis<br/>Token buckets: R=10, B=20<br/>URL cache: TTL 1hr")]
     end
 
-    %% 4. Link & analytics plane
     subgraph LAP["Link & Analytics Plane"]
-        URL["URL-Service<br/>(Link Resolution)<br/>3 instances"]
-        ANALYTICS["Analytics-Service<br/>(Event Processing)"]
+        URL["URL Service<br/>(Link Resolution, 3 instances)"]
+        KGS["KGS Service<br/>(Short Code Generation)"]
+        ANALYTICS["Analytics Service<br/>(Event Processing)"]
     end
 
-    %% 5. Message broker
     KAFKA{{"Kafka Cluster<br/>(Async Messaging)"}}
 
-    %% 6. Data persistence
-    subgraph DB["Data Persistence Layer (HikariCP, Max=50)"]
-        USERDB[("User DB<br/>Auth Data")]
-        URLDB[("URL DB<br/>Link Data")]
-        ANALYTICSDB[("Analytics DB<br/>Click Logs")]
+    subgraph DB["Data Persistence Layer (HikariCP, max=50)"]
+        USERDB[("User DB<br/>MySQL")]
+        URLDB[("URL DB<br/>MySQL")]
+        ANALYTICSDB[("Analytics DB<br/>MongoDB")]
     end
 
-    %% Gateway routing
+    %% Request flow
+    AUTH --> SEC
     RL -->|"Token bucket counters"| REDIS
     RL --> USER
     RL --> URL
     RL --> ANALYTICS
 
     %% Service discovery
-    GWL -.->|"Registration"| EUREKA
-    USER -.->|"Registration"| EUREKA
-    URL -.->|"Registration"| EUREKA
-    ANALYTICS -.->|"Registration"| EUREKA
+    GWL -.->|"Register"| EUREKA
+    SEC -.-> EUREKA
+    USER -.-> EUREKA
+    URL -.-> EUREKA
+    KGS -.-> EUREKA
+    ANALYTICS -.-> EUREKA
 
-    %% Caching
+    %% Caching and ID generation
     USER -->|"Cache"| REDIS
     URL <-->|"Cache read/write"| REDIS
-    REDIS --> ANALYTICS
+    URL --> KGS
 
     %% Event pipeline
-    URL -->|"Publish Click Event"| KAFKA
-    KAFKA -->|"Consume Click Event"| ANALYTICS
+    URL -->|"Publish click event"| KAFKA
+    KAFKA -->|"Consume click event"| ANALYTICS
 
     %% Persistence
     USER --> USERDB
@@ -155,8 +95,38 @@ graph TB
     ANALYTICS --> ANALYTICSDB
 ```
 
-## 📁 Project Structure
-```Text
+### Services
+
+| Service | Responsibility |
+|---|---|
+| **API Gateway** | Single entry point: JWT validation, rate limiting, routing |
+| **Security Service** | Centralized authentication and token validation |
+| **User Service** | User registration and login |
+| **URL Service** | Creates and resolves short URLs, publishes click events to Kafka |
+| **KGS Service** | Generates unique short codes |
+| **Analytics Service** | Consumes click events and stores click logs |
+| **Service Registry** | Eureka-based discovery and scaling |
+
+---
+
+## Tech Stack
+
+| Category | Technologies |
+|---|---|
+| Backend | Java 17, Spring Boot 3.x, Maven |
+| Microservices | Spring Cloud (Eureka, Gateway, OpenFeign) |
+| Messaging | Apache Kafka (KRaft) |
+| Security | Spring Security, OAuth2, JWT |
+| Frontend | React (Vite), Axios, React Router, Bootstrap (reactstrap), Sonner / SweetAlert2, Lucide Icons |
+| Databases | MySQL (users, URLs), MongoDB (analytics), Redis (rate limiting, URL cache) |
+| DevOps | Docker, Docker Compose, Kubernetes, ArgoCD (GitOps) |
+| Testing | Apache JMeter (load testing) |
+
+---
+
+## Project Structure
+
+```text
 url-shortener/
 ├── backend/
 │   ├── api-gateway/
@@ -172,40 +142,43 @@ url-shortener/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
+
 ### Prerequisites
-- **Docker Desktop** (8 GB RAM allocated or more is recommended)
+
+- **Docker Desktop** (8 GB RAM or more allocated)
 - **Git**
 - **Node.js and npm** (only if you run the frontend manually)
 
 ### 1. Clone the repository
-```Bash
+
+```bash
 git clone https://github.com/Hemant15-Bl/Url-Shortener.git
 cd Url-Shortener
 ```
 
 ### 2. Start the application
 
-The startup script launches the services in the order they need (Eureka, Kafka & Redis, Security Service, then the rest):
-
 ```bash
-# Windows
+# Windows: starts services in the required order
+# (Eureka, Kafka & Redis, Security Service, then the rest)
 start-app.bat
+
+# Any OS
+docker compose up -d
 ```
 
-Or start everything directly with Docker Compose:
+**Expected startup time**
 
-```bash
-docker-compose up -d
-```
-**Startup time**
+| System | First boot |
+|---|---|
+| 16 GB+ RAM | about 2-3 minutes |
+| 8 GB RAM (with WSL memory tuning) | about 4-5 minutes |
+| 8 GB RAM (no tuning) | about 8-9 minutes |
 
-- **8 GB RAM systems:** about **4-5 minutes** with the WSL memory settings optimization. Without them the first boot can take **8-9 minutes**, because 8 or more JVMs start and run database migrations.
-- **16 GB+ RAM systems:** expect about **2-3 minutes**.
+Startup is slow on smaller machines because 8 or more JVMs start and run database migrations at once.
 
 ### 3. Open the application
-
-Once the containers show as healthy in Docker Desktop:
 
 | What | URL |
 |---|---|
@@ -215,29 +188,38 @@ Once the containers show as healthy in Docker Desktop:
 
 ---
 
-## 📈 Future Improvements
+## Engineering Decisions
+
+| Decision | Reason |
+|---|---|
+| **Kafka** | Decouples analytics from the request lifecycle, improving latency and reliability |
+| **Redis** | Cuts database hits for hot URLs and stores shared rate-limit state |
+| **Security Service** | Centralizes authentication and avoids duplicated logic |
+| **Token bucket rate limiting** | Allows short bursts while protecting the system from abuse |
+| **Stateless services** | Enables horizontal scaling behind Eureka |
+
+---
+
+## Troubleshooting
+
+| Issue | Root Cause | Fix |
+|---|---|---|
+| **PVCs stuck in `Pending` (ArgoCD)** | The StorageClass uses `WaitForFirstConsumer`, but PVCs were in sync-wave 0 while the DB/Kafka workloads were in wave 4. Storage waited for a pod, and ArgoCD waited for the volume. | Put each PVC and its StatefulSet/Deployment in the same wave (`sync-wave: "0"`) so the volume binds when the pod is scheduled. |
+| **OOM kills / crash-loops (MongoDB, Kafka)** | Memory limits set below requests (invalid), and unbounded storage-engine caches on a small local VM. | Keep `limits >= requests` (MongoDB: `384Mi` / `512Mi`), cap MongoDB cache with `--wiredTigerCacheSizeGB=0.25`, and set Kafka heap to `-Xms256m -Xmx256m`. |
+| **Docker Desktop fails to start** (`io: read/write on closed pipe`) | The experimental `autoMemoryReclaim=dropcache` option was placed under `[wsl2]` in `.wslconfig`, which broke the WSL2 startup handshake. | Move it under `[experimental]`, run `netsh winsock reset`, restart the Host Compute Service (`hns`), then `wsl --shutdown`. |
+
+---
+
+## Future Improvements
+
 - Geo-based analytics
 - Custom aliases for URLs
 - Multi-region deployment
 - Circuit breakers (Resilience4j)
-- Kubernetes deployment
 
 ---
 
-## 💡 Engineering Decisions
-- **Why Kafka?**
-  - Decouples analytics from request lifecycle
-  - Improves performance and reliability
-- **Why Redis?**
-  - Reduces DB hits for frequently accessed URLs
-- **Why Security Service?**
-  - Avoids duplication and centralizes authentication logic
-- **Why Rate Limiting?**
-  - Protects system from abuse and ensures fair usage
-
----
-
-## 📸 Screenshots
+## Screenshots
 
 <table>
   <tr>
@@ -252,18 +234,19 @@ Once the containers show as healthy in Docker Desktop:
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/dashboard.jpeg?raw=true" alt="User dashboard with short urls"><br>
+      <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/dashboard.jpeg?raw=true" alt="User dashboard with short URLs"><br>
       <sub>Dashboard</sub>
     </td>
     <td align="center" width="50%">
-      <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/analytics.jpeg?raw=true" alt="analytics logs"><br>
-      <sub>Analytics Logs</sub>
+      <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/analytics.jpeg?raw=true" alt="Analytics logs"><br>
+      <sub>Analytics logs</sub>
     </td>
   </tr>
 </table>
 
 ---
 
-## 👨‍💻 Author
+## Author
+
 Built by [Hemant15-Bl](https://github.com/Hemant15-Bl). Docker images: [hemantbarole](https://hub.docker.com/u/hemantbarole).
 
