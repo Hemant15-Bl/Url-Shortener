@@ -138,7 +138,7 @@ url-shortener/
 │   ├── url-service/
 │   └── analytics-service/
 └── frontend/
-    └── url-shortener-ui/
+│   └── url-shortener-ui/
 ├── k8s/                  # Kubernetes manifests (synced by ArgoCD)
 └── docker-compose.yml
 ```
@@ -165,9 +165,9 @@ cd Url-Shortener
 Create a `.env` file next to `docker-compose.yml`, using `.env.example` as a template:
 
 ```env
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-INTERNAL_SECRET=change-me
+GOOGLE_CLIENT_ID=200566460056-qlkqa2crgiottbur2dg8k5geq2fjn04q.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+INTERNAL_SECRET=my-super-secret-key
 ```
 
 `.env` is git-ignored, so don't commit real credentials.
@@ -293,11 +293,11 @@ Per endpoint:
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/dashboard.jpeg?raw=true" alt="User dashboard with short URLs"><br>
+      <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/url-dashboard.jpeg?raw=true" alt="User dashboard with short URLs"><br>
       <sub>Dashboard</sub>
     </td>
     <td align="center" width="50%">
-      <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/analytics.jpeg?raw=true" alt="Analytics logs"><br>
+      <img src="https://github.com/Hemant15-Bl/Url-Shortener/blob/main/url-analytics.jpeg?raw=true" alt="Analytics logs"><br>
       <sub>Analytics logs</sub>
     </td>
   </tr>
