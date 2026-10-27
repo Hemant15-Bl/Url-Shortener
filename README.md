@@ -1,13 +1,13 @@
-# 🚀 SwiftLink — Distributed URL Shortener Platform
+# SwiftLink — Distributed URL Shortener Platform
 
 ![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x%20%7C%204.x-6DB33F?logo=springboot&logoColor=white)
-![Spring AI](https://img.shields.io/badge/Spring%20AI-2.0-6DB33F?logo=spring&logoColor=white)
 ![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=black)
+![Kafka](https://img.shields.io/badge/Apache%20Kafka-KRaft-231F20?logo=apachekafka&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Cache%20%26%20Rate%20Limit-DC382D?logo=redis&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
-SwiftLink is a production-grade, distributed URL shortening platform designed to handle high traffic, ensure secure authentication, and process analytics asynchronously at scale.
-Built using modern backend principles, this project demonstrates microservices architecture, event-driven design, caching, and rate limiting, similar to real-world systems.
+SwiftLink is a distributed URL shortening platform built around 7 Spring Boot microservices and a React frontend. It uses JWT authentication, Redis caching, gateway-level rate limiting, and Kafka-based asynchronous click analytics. It runs locally with Docker Compose and is also deployed to Kubernetes with ArgoCD (GitOps).
 
 ---
 
@@ -23,8 +23,8 @@ Built using modern backend principles, this project demonstrates microservices a
 - **Scalable URL shortening:** a distributed ID strategy generates unique short codes without collisions across service instances.
 - **Event-driven analytics:** the URL Service publishes click events to Kafka, and the Analytics Service consumes and stores them asynchronously.
 - **Redis caching:** frequently accessed URLs are cached (TTL 1 hour) to reduce database load and latency.
-- **Rate limiting:** a token bucket at the gateway allows 10 requests/sec with bursts up to 20.
-- **Reactive API Gateway:** Spring Cloud Gateway (WebFlux) handles routing, authentication, and rate limiting.
+- **Rate limiting:** a Redis-backed token bucket at the gateway, keyed by client IP, with a refill rate of 5 requests/sec and a burst capacity of 10.
+- **Reactive API Gateway:** Spring Cloud Gateway (WebFlux) handles routing, authentication, CORS, and rate limiting.
 - **Service discovery:** Eureka provides dynamic registration, so services can scale horizontally.
 
 ---
@@ -34,11 +34,11 @@ Built using modern backend principles, this project demonstrates microservices a
 ```mermaid
 graph TB
     Browser["Browser"] --> UI["React UI :3000"]
-    JMeter["JMeter<br/>50 concurrent users"]
+    JMeter["JMeter<br/>load test"]
 
-    subgraph GWL["API Gateway Layer (Spring Cloud Gateway)"]
+    subgraph GWL["API Gateway Layer (Spring Cloud Gateway :9096)"]
         AUTH["A. Authentication Filter"]
-        RL["B. Request Rate Limiter<br/>(Token Bucket)"]
+        RL["B. Request Rate Limiter<br/>(Token Bucket, per client IP)"]
         AUTH --> RL
     end
     UI --> AUTH
@@ -48,20 +48,21 @@ graph TB
         EUREKA["Eureka Server<br/>(Service Discovery)"]
         SEC["Security Service<br/>(JWT Validation)"]
         USER["User Service<br/>(Registration / Login)"]
-        REDIS[("Redis<br/>Token buckets: R=10, B=20<br/>URL cache: TTL 1hr")]
+        REDIS[("Redis<br/>Token bucket: R=5, B=10<br/>URL cache: TTL 1hr")]
     end
 
     subgraph LAP["Link & Analytics Plane"]
-        URL["URL Service<br/>(Link Resolution, 3 instances)"]
+        URL["URL Service<br/>(Link Resolution, scalable replicas)"]
         KGS["KGS Service<br/>(Short Code Generation)"]
         ANALYTICS["Analytics Service<br/>(Event Processing)"]
     end
 
-    KAFKA{{"Kafka Cluster<br/>(Async Messaging)"}}
+    KAFKA{{"Kafka (KRaft)<br/>Async Messaging"}}
 
-    subgraph DB["Data Persistence Layer (HikariCP, max=50)"]
+    subgraph PERSIST["Data Persistence Layer"]
         USERDB[("User DB<br/>MySQL")]
-        URLDB[("URL DB<br/>MySQL")]
+        KGSDB[("KGS DB<br/>MySQL")]
+        URLDB[("URL DB<br/>MongoDB")]
         ANALYTICSDB[("Analytics DB<br/>MongoDB")]
     end
 
@@ -81,7 +82,6 @@ graph TB
     ANALYTICS -.-> EUREKA
 
     %% Caching and ID generation
-    USER -->|"Cache"| REDIS
     URL <-->|"Cache read/write"| REDIS
     URL --> KGS
 
@@ -91,21 +91,22 @@ graph TB
 
     %% Persistence
     USER --> USERDB
+    KGS --> KGSDB
     URL --> URLDB
     ANALYTICS --> ANALYTICSDB
 ```
 
 ### Services
 
-| Service | Responsibility |
-|---|---|
-| **API Gateway** | Single entry point: JWT validation, rate limiting, routing |
-| **Security Service** | Centralized authentication and token validation |
-| **User Service** | User registration and login |
-| **URL Service** | Creates and resolves short URLs, publishes click events to Kafka |
-| **KGS Service** | Generates unique short codes |
-| **Analytics Service** | Consumes click events and stores click logs |
-| **Service Registry** | Eureka-based discovery and scaling |
+| Service | Port | Responsibility |
+|---|---|---|
+| **API Gateway** | 9096 | Single entry point: authentication, rate limiting, CORS, routing |
+| **Service Registry (Eureka)** | 8761 | Service discovery and registration |
+| **Security Service** | 9099 | Centralized JWT validation |
+| **User Service** | 9098 | User registration and login (MySQL) |
+| **KGS Service** | 9097 | Generates unique short codes (MySQL) |
+| **URL Service** | 9094 | Creates and resolves short URLs (MongoDB), caches in Redis, publishes click events |
+| **Analytics Service** | 9091 | Consumes click events and stores click logs (MongoDB) |
 
 ---
 
@@ -115,11 +116,11 @@ graph TB
 |---|---|
 | Backend | Java 17, Spring Boot 3.x, Maven |
 | Microservices | Spring Cloud (Eureka, Gateway, OpenFeign) |
-| Messaging | Apache Kafka (KRaft) |
+| Messaging | Apache Kafka (KRaft mode, no Zookeeper) |
 | Security | Spring Security, OAuth2, JWT |
 | Frontend | React (Vite), Axios, React Router, Bootstrap (reactstrap), Sonner / SweetAlert2, Lucide Icons |
-| Databases | MySQL (users, URLs), MongoDB (analytics), Redis (rate limiting, URL cache) |
-| DevOps | Docker, Docker Compose, Kubernetes, ArgoCD (GitOps) |
+| Databases | MySQL (users, KGS), MongoDB (URLs, analytics), Redis (rate limiting, URL cache) |
+| DevOps | Docker, Docker Compose, Kubernetes, ArgoCD (GitOps), GitHub Actions |
 | Testing | Apache JMeter (load testing) |
 
 ---
@@ -138,6 +139,8 @@ url-shortener/
 │   └── analytics-service/
 └── frontend/
     └── url-shortener-ui/
+├── k8s/                  # Kubernetes manifests (synced by ArgoCD)
+└── docker-compose.yml
 ```
 
 ---
@@ -157,11 +160,22 @@ git clone https://github.com/Hemant15-Bl/Url-Shortener.git
 cd Url-Shortener
 ```
 
-### 2. Start the application
+### 2. Configure secrets
+
+Create a `.env` file next to `docker-compose.yml`, using `.env.example` as a template:
+
+```env
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+INTERNAL_SECRET=change-me
+```
+
+`.env` is git-ignored, so don't commit real credentials.
+
+### 3. Start the application
 
 ```bash
 # Windows: starts services in the required order
-# (Eureka, Kafka & Redis, Security Service, then the rest)
 start-app.bat
 
 # Any OS
@@ -178,13 +192,52 @@ docker compose up -d
 
 Startup is slow on smaller machines because 8 or more JVMs start and run database migrations at once.
 
-### 3. Open the application
+### 4. Open the application
 
 | What | URL |
 |---|---|
 | Frontend | http://localhost:3000 |
-| API Gateway | http://localhost:8084 |
+| API Gateway | http://localhost:9096 |
 | Eureka dashboard | http://localhost:8761 |
+
+### Kubernetes (ArgoCD)
+
+Manifests live in `k8s/` and are synced by ArgoCD. The CI pipeline updates the image tag in the manifests after each build, and ArgoCD rolls the change out. PVCs and their workloads share one sync wave so `WaitForFirstConsumer` volumes bind correctly (see Troubleshooting). Load tests on Kubernetes are planned.
+
+---
+
+## Performance Testing
+
+Load tests were run with Apache JMeter against the Docker Compose deployment on a single local machine (JMeter and the system under test shared the same host). Each virtual user logs in, then requests its URL list using the session cookie. Each user runs once (loop count 1) with a 10 second ramp-up. The gateway rate limiter was active at **refill rate 5 requests/sec, burst capacity 10**, keyed by client IP.
+
+| Run | Users | Requests | Avg latency | Max latency | Throughput | Non-2xx |
+|---|---|---|---|---|---|---|
+| 1. Baseline | 50 | 100 | 1,872 ms | 8,630 ms | 6.7 req/s | 28% |
+| 2. Higher load | 200 | 400 | 4,022 ms | 9,925 ms | 20.0 req/s | 91% |
+
+Per endpoint:
+
+| Run | Endpoint | Samples | Avg | Min | Max | Std dev | Non-2xx | Throughput |
+|---|---|---|---|---|---|---|---|---|
+| 50 users | Auth-Login | 50 | 3,549 ms | 851 ms | 8,630 ms | 1,835 ms | 28% | 3.4/s |
+| 50 users | Get all URLs | 50 | 196 ms | 11 ms | 516 ms | 138 ms | 28% | 3.7/s |
+| 200 users | Auth-Login | 200 | 6,718 ms | 1,007 ms | 9,925 ms | 1,826 ms | 91% | 10.3/s |
+| 200 users | Get all URLs | 200 | 1,326 ms | 29 ms | 4,375 ms | 1,235 ms | 91% | 10.5/s |
+
+**How to read these results**
+
+- JMeter reports every non-2xx response as an error, so this column includes requests rejected by the rate limiter (HTTP 429). With all virtual users sharing one IP, and therefore one token bucket, a high rejection rate under this load is expected.
+- A failed login also leaves that user without a session cookie, so its follow-up request fails too. This is why both endpoints show the same percentage.
+- Login is the slowest endpoint at both loads, and the main candidate for tuning.
+- The response-code breakdown (429 vs 401 vs 5xx) is not yet recorded, so these runs show overall behavior under load and don't yet prove how many requests were throttled versus failed.
+
+**Next measurements**
+
+- Record the response-code breakdown and p95/p99 latency for successful requests, using JMeter in non-GUI mode (`jmeter -n -t plan.jmx -l results.jtl -e -o report/`).
+- Test many distinct clients by sending a different `X-Forwarded-For` per user, to check that normal users aren't throttled.
+- Run a capacity test with the limiter relaxed, to find the throughput ceiling of the services.
+- Repeat the same plan on Kubernetes and compare with Docker Compose.
+- Investigate login latency (password hashing cost, lazy initialization, and the Security and User service hops).
 
 ---
 
@@ -192,10 +245,12 @@ Startup is slow on smaller machines because 8 or more JVMs start and run databas
 
 | Decision | Reason |
 |---|---|
-| **Kafka** | Decouples analytics from the request lifecycle, improving latency and reliability |
-| **Redis** | Cuts database hits for hot URLs and stores shared rate-limit state |
+| **Kafka (KRaft)** | Decouples analytics from the request path. KRaft removes the Zookeeper container and matches the Kubernetes setup |
+| **Redis** | Cuts database reads for hot URLs and holds shared rate-limit state across gateway instances |
+| **Separate KGS with its own database** | Centralizes short-code generation so scaled-out URL Service instances don't generate duplicates |
 | **Security Service** | Centralizes authentication and avoids duplicated logic |
 | **Token bucket rate limiting** | Allows short bursts while protecting the system from abuse |
+| **Polyglot persistence** | MySQL for relational user and key data, MongoDB for URL documents and click logs |
 | **Stateless services** | Enables horizontal scaling behind Eureka |
 
 ---
@@ -207,15 +262,19 @@ Startup is slow on smaller machines because 8 or more JVMs start and run databas
 | **PVCs stuck in `Pending` (ArgoCD)** | The StorageClass uses `WaitForFirstConsumer`, but PVCs were in sync-wave 0 while the DB/Kafka workloads were in wave 4. Storage waited for a pod, and ArgoCD waited for the volume. | Put each PVC and its StatefulSet/Deployment in the same wave (`sync-wave: "0"`) so the volume binds when the pod is scheduled. |
 | **OOM kills / crash-loops (MongoDB, Kafka)** | Memory limits set below requests (invalid), and unbounded storage-engine caches on a small local VM. | Keep `limits >= requests` (MongoDB: `384Mi` / `512Mi`), cap MongoDB cache with `--wiredTigerCacheSizeGB=0.25`, and set Kafka heap to `-Xms256m -Xmx256m`. |
 | **Docker Desktop fails to start** (`io: read/write on closed pipe`) | The experimental `autoMemoryReclaim=dropcache` option was placed under `[wsl2]` in `.wslconfig`, which broke the WSL2 startup handshake. | Move it under `[experimental]`, run `netsh winsock reset`, restart the Host Compute Service (`hns`), then `wsl --shutdown`. |
+| **Kafka exits with `InconsistentClusterIdException`** | Zookeeper had no persistent volume, so its cluster ID was regenerated while Kafka's volume kept the old one. | Moved Kafka to KRaft mode (no Zookeeper) and removed the stale Kafka volume once. |
 
 ---
 
 ## Future Improvements
 
+- Resolve the client IP from `X-Forwarded-For` for rate limiting behind a proxy or Ingress
+- Per-user rate limiting in addition to per-IP
+- Total click counts on the dashboard
 - Geo-based analytics
 - Custom aliases for URLs
-- Multi-region deployment
 - Circuit breakers (Resilience4j)
+- Multi-region deployment
 
 ---
 
