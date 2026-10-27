@@ -1,177 +1,191 @@
-import React, { useEffect, useState } from 'react'
-import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { X, ChevronDown } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
+import { X, ChevronDown, Loader2 } from 'lucide-react';
 import { loadLinkHistory, loadLinkStats } from '../Services/Analytic-service';
+import '../css/AnalyticsModal.css';
 
-const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#0f766e', '#2563eb', '#d97706', '#7c3aed', '#be123c', '#64708a'];
+
+const formatTime = (value) =>
+  value ? new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+
+// Tidy raw user-agent / network values for display
+const formatIp = (ip) => (ip === '0:0:0:0:0:0:0:1' || ip === '::1' ? 'localhost' : ip || '-');
+const formatOs = (os) => {
+  if (!os || os.includes('??')) return 'Unknown OS';
+  return os.replace(/>=\s*(\d+)/, '$1+');
+};
 
 const AnalyticsModal = ({ shortCode, onClose }) => {
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(null);
+  const closeRef = useRef(null);
 
-  // 1. Initial Load: Get Summary and First Page of History
-  useEffect(() => {
-
-    const fetchInitialData = async () => {
+  const fetchHistory = useCallback(
+    async (pageToFetch) => {
+      setLoadingMore(true);
       try {
-        // Fetch Summary (Total clicks, etc.)
+        const res = await loadLinkHistory(pageToFetch, shortCode);
+        setHistory((prev) => (pageToFetch === 0 ? res.content : [...prev, ...res.content]));
+        setHasMore(!res.last);
+        setPage(pageToFetch + 1);
+      } catch (err) {
+        console.error('History fetch error:', err);
+        setError("Couldn't load click activity.");
+      } finally {
+        setLoadingMore(false);
+      }
+    },
+    [shortCode]
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoadingStats(true);
+      setError(null);
+      try {
         const data = await loadLinkStats(shortCode);
-
-        console.log("This data from 'LinkStats' Collection:",data);
-        
-        // Transform the summary for the Chart (Assuming backend still calculates this or use a dummy)
-        const chartData = data.chartData || [];
-
-        // Assign colors to the data items here
-const coloredChartData = chartData.map((item, index) => ({
-  ...item,
-  fill: COLORS[index % COLORS.length] // Now COLORS is being used!
-}));
-        setStats({ ...data, chartData: coloredChartData});
-
-        
-        // Fetch First Page of History        
+        if (cancelled) return;
+        const chartData = (data.chartData || []).map((item, i) => ({
+          ...item,
+          fill: COLORS[i % COLORS.length],
+        }));
+        setStats({ ...data, chartData });
         fetchHistory(0);
       } catch (err) {
-        console.error("Initial fetch error:", err);
+        console.error('Initial fetch error:', err);
+        if (!cancelled) setError("Couldn't load analytics for this link.");
+      } finally {
+        if (!cancelled) setLoadingStats(false);
       }
+    })();
+    return () => { cancelled = true; };
+  }, [shortCode, fetchHistory]);
+
+  // Escape to close, lock page scroll, focus the close button
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
     };
-    fetchInitialData();
-  }, [shortCode]);
+  }, [onClose]);
 
-  // 2. Function to fetch paginated history
-  const fetchHistory = async (pageToFetch) => {
-    setLoading(true);
-    try {
-      const res = await loadLinkHistory(pageToFetch, shortCode);
+  const { total, topBrowser } = useMemo(() => {
+    const data = stats?.chartData || [];
+    const sum = data.reduce((s, d) => s + d.value, 0);
+    const top = data.reduce((a, b) => (b.value > (a?.value ?? -1) ? b : a), null);
+    return { total: sum, topBrowser: top?.name || 'No data' };
+  }, [stats]);
 
-              // console.log("histroy from 'Click_Log' Collection:",res);
-
-      const newLogs = res.content;
-      setHistory(prev =>{ return pageToFetch === 0 ? newLogs : [...prev, ...newLogs]});
-      
-      setHasMore(!res.last); // 'last' is provided by Spring Pageable
-      setPage(pageToFetch + 1);
-    } catch (err) {
-      console.error("History fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  if (!stats) return null;
-
-  
   return (
-    <div style={modalOverlayStyle}>
-      <div style={modalContentStyle}>
-        <button onClick={onClose} style={closeButtonStyle}><X size={20} /></button>
-
-        <h2>Insights for /{shortCode}</h2>
-        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
-          <div style={statBox}>
-            <small>Total Clicks</small>
-            <h3>{stats.totalClick}</h3>
+    <div className="sl-modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="sl-modal" role="dialog" aria-modal="true" aria-labelledby="analytics-title">
+        <header className="sl-modal-head">
+          <div>
+            <h2 id="analytics-title">Link analytics</h2>
+            <p className="sl-modal-sub">/{shortCode}</p>
           </div>
-          <div style={statBox}>
-            <small>Top Browser</small>
-            {/* Logic: Pick the first item from chartData or 'N/A' */}
-            <h3>{stats.chartData?.[0]?.name || 'N/A'}</h3>
+          <button ref={closeRef} onClick={onClose} className="sl-icon-btn" aria-label="Close analytics">
+            <X size={20} />
+          </button>
+        </header>
+
+        {loadingStats ? (
+          <div className="sl-modal-state"><Loader2 className="sl-spin" size={28} /><p>Loading analytics...</p></div>
+        ) : !stats ? (
+          <div className="sl-modal-state"><p>{error}</p></div>
+        ) : (
+          <div className="sl-modal-body">
+            <div className="sl-metrics">
+              <div className="sl-metric">
+                <span>Total clicks</span>
+                <strong>{stats.totalClick ?? 0}</strong>
+              </div>
+              <div className="sl-metric">
+                <span>Top browser</span>
+                <strong>{topBrowser}</strong>
+              </div>
+              <div className="sl-metric">
+                <span>Last click</span>
+                <strong className="sl-metric-small">{history[0] ? formatTime(history[0].clickedAt || history[0].timestamp) : '-'}</strong>
+              </div>
+            </div>
+
+            <section className="sl-panel">
+              <h3>Browsers</h3>
+              {stats.chartData.length > 0 ? (
+                <div className="sl-browsers">
+                  <div className="sl-donut">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={stats.chartData} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="92%" paddingAngle={3} stroke="none" />
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <ul className="sl-legend">
+                    {stats.chartData.map((d) => (
+                      <li key={d.name}>
+                        <span className="sl-dot" style={{ background: d.fill }} />
+                        <span className="sl-legend-name">{d.name}</span>
+                        <span className="sl-legend-val">
+                          {d.value} <em>({total ? Math.round((d.value / total) * 100) : 0}%)</em>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p className="sl-muted">No browser data yet. Clicks on this link will appear here.</p>
+              )}
+            </section>
+
+            <section className="sl-panel">
+              <h3>Recent clicks</h3>
+              {history.length === 0 && !loadingMore ? (
+                <p className="sl-muted">No clicks recorded yet.</p>
+              ) : (
+                <div className="sl-table-wrap">
+                  <table className="sl-table">
+                    <thead>
+                      <tr><th>Time</th><th>IP address</th><th>Browser</th><th>System</th></tr>
+                    </thead>
+                    <tbody>
+                      {history.map((log, i) => (
+                        <tr key={log.id ?? `${log.clickedAt || log.timestamp}-${i}`}>
+                          <td>{formatTime(log.clickedAt || log.timestamp)}</td>
+                          <td>{formatIp(log.ipAddress)}</td>
+                          <td>{log.browser || 'Unknown'}</td>
+                          <td>{formatOs(log.os)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {error && <p className="sl-error">{error}</p>}
+              {hasMore && (
+                <button onClick={() => fetchHistory(page)} disabled={loadingMore} className="sl-btn sl-btn-outline sl-more">
+                  {loadingMore ? <Loader2 className="sl-spin" size={16} /> : <ChevronDown size={16} />}
+                  {loadingMore ? 'Loading...' : 'Show more'}
+                </button>
+              )}
+            </section>
           </div>
-        </div>
-
-        {/* Chart Section */}
-        <div style={{ width: '100%', height: '250px'}}>
-          <h4>Browser Distribution</h4>
-          {stats.chartData && stats.chartData?.length > 0 ? (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={stats.chartData}
-          innerRadius={60}
-          outerRadius={80}
-          paddingAngle={5}
-          dataKey="value"
-          nameKey="name"
-          label={({ name }) => name}
-        />
-        <Tooltip />
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
-  ) : (
-    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-       <small>No browser data available yet...</small>
-    </div>
-  )}
-        </div>
-
-        {/* Paginated Table Section */}
-        <div style={tableContainerStyle}>
-          <h4>Recent Click Activity</h4>
-          <table style={tableStyle}>
-            <thead>
-              <tr style={theadStyle}>
-                <th>Timestamp</th>
-                <th>IP</th>
-                <th>Browser/OS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.map((log, index) => (
-                <tr key={index} style={rowStyle}>
-                  <td>{new Date(log.clickedAt || log.timestamp).toLocaleString()}</td>
-                  <td style={{ fontFamily: 'monospace' }}>{log.ipAddress}</td>
-                  <td>{log.browser} / {log.os}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Load More Button */}
-          {hasMore && (
-            <button
-              onClick={() => fetchHistory(page)}
-              disabled={loading}
-              style={loadMoreButtonStyle}
-            >
-              {loading ? 'Loading...' : <><ChevronDown size={16} /> Load More</>}
-            </button>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
 };
-
-// ... keep your existing modalOverlayStyle, modalContentStyle, etc. ...
-
-const loadMoreButtonStyle = {
-  width: '100%',
-  padding: '10px',
-  marginTop: '10px',
-  background: '#f1f5f9',
-  border: '1px dashed #cbd5e1',
-  borderRadius: '6px',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '5px',
-  color: '#64748b'
-};
-
-const tableContainerStyle = { marginTop: '30px', maxHeight: '300px', overflowY: 'auto', borderTop: '1px solid #eee' };
-const tableStyle = { width: '100%', borderCollapse: 'collapse', fontSize: '12px' };
-const theadStyle = { position: 'sticky', top: 0, background: 'white' };
-const rowStyle = { borderBottom: '1px solid #f1f5f9' };
-const statBox = { textAlign: 'center', padding: '10px', background: '#f8fafc', borderRadius: '8px' };
-const modalOverlayStyle = { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 };
-const modalContentStyle = { background: 'white', padding: '30px', borderRadius: '12px', width: '90%', maxWidth: '600px', position: 'relative' };
-const closeButtonStyle = { position: 'absolute', top: '15px', right: '15px', border: 'none', background: 'none', cursor: 'pointer' };
-
 export default AnalyticsModal;

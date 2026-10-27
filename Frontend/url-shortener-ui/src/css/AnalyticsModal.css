@@ -1,0 +1,90 @@
+.sl-modal-overlay {
+  --bg: #f5f6f8; --surface: #fff; --ink: #12192b; --muted: #64708a;
+  --line: #e3e6ec; --accent: #0f766e; --accent-soft: #e6f4f2; --danger: #b42318;
+  position: fixed; inset: 0; z-index: 1000; padding: 20px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(18, 25, 43, .55);
+  font-family: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+}
+.sl-modal-overlay *, .sl-modal-overlay *::before, .sl-modal-overlay *::after { box-sizing: border-box; }
+.sl-modal-overlay :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.sl-modal {
+  width: 100%; max-width: 680px; max-height: calc(100vh - 40px);
+  display: flex; flex-direction: column;
+  background: var(--surface); border-radius: 16px; box-shadow: 0 24px 60px rgba(18, 25, 43, .25);
+  animation: sl-modal-in .18s ease-out;
+}
+@keyframes sl-modal-in { from { opacity: 0; transform: translateY(8px); } }
+
+.sl-modal-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--line);
+}
+.sl-modal-head h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.sl-modal-sub { margin: 2px 0 0; color: var(--accent); font-weight: 600; font-size: 14px; }
+.sl-modal-body { padding: 20px 24px 24px; overflow-y: auto; display: grid; gap: 20px; }
+.sl-modal-state { padding: 56px 24px; display: grid; justify-items: center; gap: 10px; color: var(--muted); }
+.sl-modal-state p { margin: 0; }
+
+/* Metrics */
+.sl-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.sl-metric { padding: 14px 16px; background: var(--bg); border-radius: 12px; min-width: 0; }
+.sl-metric span { display: block; font-size: 13px; color: var(--muted); }
+.sl-metric strong { display: block; margin-top: 2px; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-metric .sl-metric-small { font-size: 15px; line-height: 2; letter-spacing: 0; }
+
+/* Panels */
+.sl-panel h3 { margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+.sl-muted { margin: 0; color: var(--muted); font-size: 14px; }
+.sl-error { margin: 10px 0 0; color: var(--danger); font-size: 14px; }
+
+.sl-browsers { display: flex; align-items: center; gap: 28px; }
+.sl-donut { flex: none; width: 170px; height: 170px; }
+.sl-legend { list-style: none; margin: 0; padding: 0; flex: 1; display: grid; gap: 10px; }
+.sl-legend li { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.sl-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.sl-legend-name { flex: 1; font-weight: 500; }
+.sl-legend-val { font-weight: 600; }
+.sl-legend-val em { font-style: normal; font-weight: 400; color: var(--muted); }
+
+/* Table */
+.sl-table-wrap { max-height: 280px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; }
+.sl-table { width: 100%; border-collapse: collapse; font-size: 14px; white-space: nowrap; }
+.sl-table th {
+  position: sticky; top: 0; background: var(--bg); text-align: left;
+  padding: 10px 14px; font-weight: 600; font-size: 13px; color: var(--muted);
+}
+.sl-table td { padding: 10px 14px; border-top: 1px solid var(--line); }
+.sl-more { width: 100%; margin-top: 12px; }
+
+/* Shared bits (also defined in Dashboard.css; duplicated so the modal stands alone) */
+.sl-modal-overlay .sl-icon-btn {
+  display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 8px;
+  border: 0; background: transparent; color: var(--muted); cursor: pointer; flex: none;
+}
+.sl-modal-overlay .sl-icon-btn:hover { background: var(--bg); color: var(--ink); }
+.sl-modal-overlay .sl-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 38px; padding: 0 14px; border-radius: 10px; font: inherit; font-weight: 600; font-size: 14px; cursor: pointer;
+}
+.sl-modal-overlay .sl-btn-outline { background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
+.sl-modal-overlay .sl-btn-outline:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.sl-modal-overlay .sl-btn:disabled { opacity: .7; cursor: not-allowed; }
+.sl-spin { animation: sl-rotate .8s linear infinite; }
+@keyframes sl-rotate { to { transform: rotate(360deg); } }
+
+@media (max-width: 560px) {
+  .sl-modal-overlay { padding: 0; align-items: flex-end; }
+  .sl-modal { max-height: 92vh; border-radius: 16px 16px 0 0; }
+  .sl-modal-body { padding: 16px; }
+  .sl-metrics { grid-template-columns: 1fr 1fr; }
+  .sl-metrics .sl-metric:last-child { grid-column: 1 / -1; }
+  .sl-browsers { flex-direction: column; align-items: stretch; }
+  .sl-donut { align-self: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sl-modal, .sl-spin { animation: none; }
+}
