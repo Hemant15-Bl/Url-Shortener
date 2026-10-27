@@ -1,1 +1,13 @@
-/.metadata/
+.metadata/
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+*.iml
+target/
+node_modules/
+dist/
+*.log
+.env
+Thumbs.db
