@@ -11228,3 +11228,144 @@ This warning can be switched off on the Team > Git > Confirmations and Warnings 
 
 !ENTRY org.eclipse.lsp4e 4 0 2026-07-09 23:41:56.415
 !MESSAGE 22:00:27.280 [Reconciler-1] INFO  o.s.i.v.b.m.SpringPropertiesIndexManager - Indexed 2737 properties.
+!SESSION 2026-08-05 09:41:09.031 -----------------------------------------------
+eclipse.buildId=4.37.0.202511091838
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_IN
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.springframework.boot.ide.branding.sts4
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-05 09:42:45.008
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2026-08-05 09:42:56.044
+!MESSAGE Logback config file: F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.m2e.logback\logback.2.7.101.20251017-1242.xml
+
+!ENTRY org.eclipse.ui 2 0 2026-08-05 09:42:58.131
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2026-08-05 09:42:58.131
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.ui 2 0 2026-08-05 09:42:59.436
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2026-08-05 09:42:59.436
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.e4.ui.workbench 4 0 2026-08-05 09:43:07.653
+!MESSAGE Unable to retrieve the bundle from the URI: bundleclass://com.genuitec.eclipse.meexplorer/com.genuitec.eclipse.meexplorer.breadcrumb.e4.BreadCrumbContainer
+
+!ENTRY org.eclipse.ui 4 0 2026-08-05 09:43:36.446
+!MESSAGE Abnormal Workbench Condition
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-08-05 09:43:42.617
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\hp'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:35.620
+!MESSAGE 09:44:35.587 [Simple-Language-Server main thread] INFO  o.s.i.v.b.a.BootVersionValidationConfig - Started Boot Version reconciler
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:36.217
+!MESSAGE 09:44:36.209 [Simple-Language-Server main thread] INFO  o.s.i.v.boot.app.SpringSymbolIndex - update settings of spring indexer - start
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:36.266
+!MESSAGE 09:44:36.258 [Simple-Language-Server main thread] INFO  o.s.i.v.b.j.l.v.SpringProcessConnectorRemote - updating settings for remote processses to track - done
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:36.331
+!MESSAGE 09:44:36.315 [Simple-Language-Server main thread] INFO  o.s.i.v.b.a.BootLanguageServerInitializer - Triggering reconcile on all open documents
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:39.565
+!MESSAGE 09:44:39.547 [pool-5-thread-1] INFO  o.s.i.v.b.j.u.SpringFactoriesIndexer - scan factories files for symbols for project: AnalyticsService - no. of files: 0
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:39.610
+!MESSAGE 09:44:39.584 [Simple-Language-Server main thread] INFO  o.s.i.v.boot.app.SpringSymbolIndex - project created event: KeyGeneration
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:39.755
+!MESSAGE 09:44:39.713 [pool-5-thread-1] INFO  o.s.i.v.b.j.u.SpringFactoriesIndexer - scan factories files for symbols for project: AnalyticsService took ms: 178
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:40.039
+!MESSAGE 09:44:39.981 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files restored cached dependency data: 0 - no. of cached dependencies: {}
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:41.333
+!MESSAGE 09:44:41.194 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files for symbols for project: APIGateway - no. of files: 7
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:41.539
+!MESSAGE 09:44:41.490 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files restored cached dependency data: 0 - no. of cached dependencies: {}
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:41.575
+!MESSAGE 09:44:41.570 [pool-5-thread-1] INFO  o.s.i.v.b.j.u.SpringFactoriesIndexer - scan factories files used cached data: DiscoveryService - no. of cached symbols retrieved: 0
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:41.820
+!MESSAGE 09:44:41.808 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files restored cached dependency data: 0 - no. of cached dependencies: {}
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:41.855
+!MESSAGE 09:44:41.832 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files for symbols for project: DiscoveryService took ms: 249
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:41.951
+!MESSAGE 09:44:41.880 [pool-5-thread-1] INFO  o.s.i.v.b.j.u.SpringFactoriesIndexer - scan factories files for symbols for project: KeyGeneration took ms: 29
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:42.364
+!MESSAGE 09:44:42.300 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files restored cached dependency data: 0 - no. of cached dependencies: {}
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:42.713
+!MESSAGE 09:44:42.685 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files restored cached dependency data: 0 - no. of cached dependencies: {}
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:42.718
+!MESSAGE 09:44:42.698 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files for symbols for project: SecurityService took ms: 282
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:42.832
+!MESSAGE 09:44:42.749 [pool-5-thread-1] INFO  o.s.i.v.b.j.u.SpringFactoriesIndexer - scan factories files for symbols for project: URLService took ms: 51
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:43.317
+!MESSAGE 09:44:43.173 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files restored cached dependency data: 0 - no. of cached dependencies: {}
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:44.891
+!MESSAGE 09:44:43.617 [pool-5-thread-1] INFO  o.s.i.v.b.j.utils.SpringIndexerJava - scan java files restored cached dependency data: 0 - no. of cached dependencies: {}
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:45.962
+!MESSAGE 09:44:45.248 [Project-Reconciler-1] INFO  o.s.i.v.boot.app.RestTemplateFactory - Env var https_proxy: null
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:44:46.050
+!MESSAGE 09:44:46.044 [Project-Reconciler-1] INFO  o.s.i.v.b.v.BootVersionValidationEngine - validating Spring Boot version on project: UserService done in 8ms
+
+!ENTRY org.eclipse.lsp4e 4 0 2026-08-05 09:46:48.544
+!MESSAGE 09:44:58.955 [Reconciler-1] INFO  o.s.i.v.b.m.SpringPropertiesIndexManager - Indexed 2737 properties.
+!SESSION 2026-10-27 10:04:59.381 -----------------------------------------------
+eclipse.buildId=4.37.0.202511091838
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_IN
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.springframework.boot.ide.branding.sts4 -data F:/UrlShortener/Backend
+
+!ENTRY ch.qos.logback.classic 1 0 2026-10-27 10:05:12.794
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2026-10-27 10:05:18.826
+!MESSAGE Logback config file: F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.m2e.logback\logback.2.7.101.20251017-1242.xml
+
+!ENTRY org.eclipse.ui 2 0 2026-10-27 10:05:20.237
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2026-10-27 10:05:20.237
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.ui 2 0 2026-10-27 10:05:21.284
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2026-10-27 10:05:21.284
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.e4.ui.workbench 4 0 2026-10-27 10:05:26.635
+!MESSAGE Unable to retrieve the bundle from the URI: bundleclass://com.genuitec.eclipse.meexplorer/com.genuitec.eclipse.meexplorer.breadcrumb.e4.BreadCrumbContainer
+
+!ENTRY org.eclipse.ui 4 0 2026-10-27 10:05:42.807
+!MESSAGE Abnormal Workbench Condition
+
+!ENTRY org.eclipse.egit.ui 2 0 2026-10-27 10:05:49.059
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\hp'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.

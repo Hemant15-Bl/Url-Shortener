@@ -10,6 +10,7 @@
     <persistedState key="workingSets" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;workingSets/>"/>
     <persistedState key="aggregateWorkingSetId" value="Aggregate for window 1775016548151"/>
     <tags>topLevel</tags>
+    <tags>shellMaximized</tags>
     <children xsi:type="basic:PartSashContainer" xmi:id="_mdJzwlG2EfG43pUB0-gGNw" selectedElement="_mdJzw1G2EfG43pUB0-gGNw" horizontal="true">
       <children xsi:type="advanced:PerspectiveStack" xmi:id="_mdJzw1G2EfG43pUB0-gGNw" elementId="org.eclipse.ui.ide.perspectivestack" containerData="7500" selectedElement="_mdJzxFG2EfG43pUB0-gGNw">
         <children xsi:type="advanced:Perspective" xmi:id="_mdJzxFG2EfG43pUB0-gGNw" elementId="org.eclipse.jdt.ui.JavaPerspective" selectedElement="_mdJzxVG2EfG43pUB0-gGNw" label="Java" iconURI="platform:/plugin/org.eclipse.jdt.ui/icons/full/eview16/jperspective.svg">
@@ -158,7 +159,7 @@
                   </children>
                 </children>
               </children>
-              <children xsi:type="basic:PartStack" xmi:id="_mdJz3VG2EfG43pUB0-gGNw" elementId="bottom" containerData="3639" selectedElement="_mdJz6lG2EfG43pUB0-gGNw">
+              <children xsi:type="basic:PartStack" xmi:id="_mdJz3VG2EfG43pUB0-gGNw" elementId="bottom" containerData="3639" selectedElement="_B8QV0JCEEfGYm4Ato6dg8A">
                 <tags>org.eclipse.e4.secondaryDataStack</tags>
                 <tags>Git</tags>
                 <tags>Terminal</tags>
@@ -212,6 +213,10 @@
                   <tags>categoryTag:Terminal</tags>
                 </children>
                 <children xsi:type="advanced:Placeholder" xmi:id="_mdJz6lG2EfG43pUB0-gGNw" elementId="org.eclipse.terminal.view.ui.TerminalsView:3" ref="_mdLpMFG2EfG43pUB0-gGNw" closeable="true">
+                  <tags>View</tags>
+                  <tags>categoryTag:Terminal</tags>
+                </children>
+                <children xsi:type="advanced:Placeholder" xmi:id="_B8QV0JCEEfGYm4Ato6dg8A" elementId="org.eclipse.terminal.view.ui.TerminalsView:4" ref="_B8PuwJCEEfGYm4Ato6dg8A" closeable="true">
                   <tags>View</tags>
                   <tags>categoryTag:Terminal</tags>
                 </children>
@@ -545,16 +550,29 @@
     <sharedElements xsi:type="basic:Part" xmi:id="_mdLpMFG2EfG43pUB0-gGNw" elementId="org.eclipse.terminal.view.ui.TerminalsView:3" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Terminal 3" iconURI="platform:/plugin/org.eclipse.terminal.view.ui/icons/eview16/terminal_view.svg" tooltip="" closeable="true">
       <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.terminal.view.ui"/>
       <persistedState key="originalCompatibilityViewClass" value="org.eclipse.terminal.view.ui.internal.view.TerminalsView"/>
-      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view>&#xD;&#xA;&lt;terminalConnections id=&quot;org.eclipse.terminal.view.ui.TerminalsView&quot; secondaryId=&quot;3&quot;>&#xD;&#xA;&lt;connection delegateId=&quot;org.eclipse.terminal.connector.local.launcher.local&quot; encoding=&quot;UTF-8&quot; process.working_dir=&quot;C:\Users\hp&quot; terminal.forceNew=&quot;true&quot; tm.terminal.connector.id=&quot;org.eclipse.terminal.connector.local.LocalConnector&quot;/>&#xD;&#xA;&lt;/terminalConnections>&#xD;&#xA;&lt;/view>"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view>&#xD;&#xA;&lt;terminalConnections id=&quot;org.eclipse.terminal.view.ui.TerminalsView&quot; secondaryId=&quot;3&quot;/>&#xD;&#xA;&lt;/view>"/>
       <tags>View</tags>
       <tags>categoryTag:Terminal</tags>
       <tags>activeOnClose</tags>
-      <tags>active</tags>
       <menus xmi:id="_mdLpMVG2EfG43pUB0-gGNw" elementId="org.eclipse.terminal.view.ui.TerminalsView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
       </menus>
       <toolbar xmi:id="_mdLpMlG2EfG43pUB0-gGNw" elementId="org.eclipse.terminal.view.ui.TerminalsView" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_B8PuwJCEEfGYm4Ato6dg8A" elementId="org.eclipse.terminal.view.ui.TerminalsView:4" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Terminal 4" iconURI="platform:/plugin/org.eclipse.terminal.view.ui/icons/eview16/terminal_view.svg" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.terminal.view.ui"/>
+      <persistedState key="originalCompatibilityViewClass" value="org.eclipse.terminal.view.ui.internal.view.TerminalsView"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view>&#xD;&#xA;&lt;terminalConnections id=&quot;org.eclipse.terminal.view.ui.TerminalsView&quot; secondaryId=&quot;4&quot;>&#xD;&#xA;&lt;connection delegateId=&quot;org.eclipse.terminal.connector.local.launcher.local&quot; encoding=&quot;UTF-8&quot; process.working_dir=&quot;C:\Users\hp&quot; terminal.forceNew=&quot;true&quot; tm.terminal.connector.id=&quot;org.eclipse.terminal.connector.local.LocalConnector&quot;/>&#xD;&#xA;&lt;/terminalConnections>&#xD;&#xA;&lt;/view>"/>
+      <tags>View</tags>
+      <tags>categoryTag:Terminal</tags>
+      <tags>active</tags>
+      <tags>activeOnClose</tags>
+      <menus xmi:id="_B8e_UJCEEfGYm4Ato6dg8A" elementId="org.eclipse.terminal.view.ui.TerminalsView">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_B8e_UZCEEfGYm4Ato6dg8A" elementId="org.eclipse.terminal.view.ui.TerminalsView" visible="false"/>
     </sharedElements>
     <trimBars xmi:id="_mdLpM1G2EfG43pUB0-gGNw" elementId="org.eclipse.ui.main.toolbar" contributorURI="platform:/plugin/org.eclipse.platform">
       <children xsi:type="menu:ToolBar" xmi:id="_mdLpNFG2EfG43pUB0-gGNw" visible="false">
@@ -563,7 +581,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_mdLpNVG2EfG43pUB0-gGNw" elementId="org.eclipse.ui.workbench.file">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_L8-1YHuzEfGEmdH4OMmf8Q" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.svg" tooltip="Print" command="_mdRLG1G2EfG43pUB0-gGNw"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_9ZofMJCDEfGYm4Ato6dg8A" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.svg" tooltip="Print" command="_mdRLG1G2EfG43pUB0-gGNw"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_mdLpQlG2EfG43pUB0-gGNw" elementId="group.edit" toBeRendered="false">
         <tags>toolbarSeparator</tags>
@@ -571,8 +589,8 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_mdLpRFG2EfG43pUB0-gGNw" elementId="org.eclipse.ui.workbench.edit">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_L9AqkHuzEfGEmdH4OMmf8Q" elementId="undo" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/undo_edit.svg" tooltip="Undo" enabled="false" command="_mdRJLlG2EfG43pUB0-gGNw"/>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_L9B4sHuzEfGEmdH4OMmf8Q" elementId="redo" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/redo_edit.svg" tooltip="Redo" enabled="false" command="_mdRJtFG2EfG43pUB0-gGNw"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_9ZrigJCDEfGYm4Ato6dg8A" elementId="undo" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/undo_edit.svg" tooltip="Undo" enabled="false" command="_mdRJLlG2EfG43pUB0-gGNw"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_9ZswoJCDEfGYm4Ato6dg8A" elementId="redo" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/redo_edit.svg" tooltip="Redo" enabled="false" command="_mdRJtFG2EfG43pUB0-gGNw"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_mdLpSFG2EfG43pUB0-gGNw" elementId="additions" toBeRendered="false">
         <tags>toolbarSeparator</tags>
@@ -596,7 +614,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_mdLpd1G2EfG43pUB0-gGNw" elementId="org.eclipse.ui.workbench.navigate">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_L9Dt4HuzEfGEmdH4OMmf8Q" elementId="org.eclipse.ui.window.pinEditor" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.svg" tooltip="Pin Editor" enabled="false" type="Check" command="_mdRKzlG2EfG43pUB0-gGNw"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_9ZvM4JCDEfGYm4Ato6dg8A" elementId="org.eclipse.ui.window.pinEditor" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.svg" tooltip="Pin Editor" enabled="false" type="Check" command="_mdRKzlG2EfG43pUB0-gGNw"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_mdLphVG2EfG43pUB0-gGNw" elementId="group.editor" toBeRendered="false">
         <tags>toolbarSeparator</tags>

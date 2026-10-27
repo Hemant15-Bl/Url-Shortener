@@ -175,3 +175,12 @@
 2026-06-18 04:52:56.603: [INFO] OnDoneLoading sync enabled: 0
 2026-06-19 04:56:06.480: [INFO] OnDoneLoading sync enabled: 0
 2026-06-20 04:23:05.403: [INFO] OnDoneLoading sync enabled: 0
+2026-08-05 04:16:49.919: [INFO] CurrentProfilePath: F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-08-05 04:16:49.919: [INFO] Profiles total count: 1
+2026-08-05 04:16:49.920: [INFO] Profile: name=Profile 1 path=F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=null
+2026-08-05 04:16:49.920: [INFO] LastUsedProfileDir: F:\UrlShortener\Backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-08-05 04:16:49.920: [INFO] OnDoneLoading sync enabled: 0
+2026-08-05 04:16:49.920: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-08-05 04:16:49.920: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-08-05 04:16:49.920: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-08-05 04:18:31.305: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
