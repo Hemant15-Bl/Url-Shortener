@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: hemantbarole/url-shortener-ui:89bf495
+          image: hemantbarole/url-shortener-ui:9c99723
           ports:
             - containerPort: 80
           # env:
