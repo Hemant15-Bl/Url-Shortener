@@ -18,3 +18,9 @@ spec:
     automated:
       prune: true     # Automatically deletes resources in k8s if you delete them from Git
       selfHeal: true  # Automatically fixes changes if someone manually tampers with kubectl
+    retry:
+      limit: 5
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 5m

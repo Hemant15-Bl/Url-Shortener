@@ -34,6 +34,8 @@ spec:
         app: kafka
     spec:
       securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
         fsGroup: 1000
       containers:
         - name: kafka
@@ -51,6 +53,8 @@ spec:
               value: "1@localhost:9093"
             - name: KAFKA_CONTROLLER_LISTENER_NAMES
               value: "CONTROLLER"
+            - name: CLUSTER_ID
+              value: "MkU3OEVBNTcwNTg0NDM0Rk"
 
             # Networking Listeners
             - name: KAFKA_LISTENERS
@@ -65,32 +69,41 @@ spec:
             # Resource Adjustments & Optimization
             - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
               value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
+            - name: KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS
+              value: "0"
+            
             - name: KAFKA_JVM_PERFORMANCE_OPTS
-              value: "-Xmx256M -Xms128M"
+              value: "-Xms256M -Xmx256M"
             # Tells Kafka exactly where to write its persistent logs inside the container
             - name: KAFKA_LOG_DIRS
               value: "/var/lib/kafka/data"
-            - name: CLUSTER_ID
-              value: "MkU3OEVBNTcwNTg0NDM0Rk"
+            
           resources:
             requests:
               memory: "384Mi"
               cpu: "200m"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "768Mi"
+              cpu: "1000m"
+          startupProbe:
+            tcpSocket:
+              port: 9092
+            periodSeconds: 10
+            failureThreshold: 36
           # EFFICIENT NETWORK HEALTH CHECK
           livenessProbe:
             tcpSocket:
               port: 9092
-            initialDelaySeconds: 60 # Increased slightly for KRaft initialization overhead
             periodSeconds: 20
             timeoutSeconds: 10
             failureThreshold: 4
           readinessProbe:
             tcpSocket:
               port: 9092
-            initialDelaySeconds: 60
             periodSeconds: 20
             timeoutSeconds: 10
             failureThreshold: 4

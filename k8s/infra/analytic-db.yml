@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: analytic-db
-          image: mongo:latest
+          image: mongo:7.0
           args:
             - "--wiredTigerCacheSizeGB=0.25" # Increased to Mongo's hard minimum floor
           ports:
@@ -93,6 +93,6 @@ spec:
     app: analytic-db
   ports:
     - protocol: TCP
-      port: 27018
+      port: 27017
       targetPort: 27017
   type: ClusterIP

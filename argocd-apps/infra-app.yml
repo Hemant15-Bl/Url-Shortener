@@ -16,5 +16,11 @@ spec:
     namespace: default
   syncPolicy:
     automated:
-      prune: true     # Safer to keep false for infra to prevent accidental data deletion
+      prune: false     # Safer to keep false for infra to prevent accidental data deletion
       selfHeal: true   # Keeps configurations synced if manual tweaks happen
+    retry:
+      limit: 5
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 5m
