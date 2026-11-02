@@ -58,24 +58,26 @@ spec:
               cpu: "100m"
             limits:
               memory: "512Mi"
-              cpu: "300m"
+              cpu: "1000m"
           # NATIVE MYSQL HEALTH CHECK
+          startupProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-proot"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 60
           livenessProbe:
             exec:
-              command:
-                - mysqladmin
-                - ping
-                - -proot
-            initialDelaySeconds: 60 # Gives it runway to clear the init stage
+              command: ["mysqladmin", "ping", "-proot"]
             periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 4
           readinessProbe:
             exec:
-              command:
-                - mysqladmin
-                - ping
-                - -proot
-            initialDelaySeconds: 45
+              command: ["mysqladmin", "ping", "-proot"]
             periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - name: kgs-db-storage
               mountPath: /var/lib/mysql
