@@ -59,7 +59,7 @@ spec:
           resources:
             requests:
               memory: "150Mi"
-              cpu: "40m"
+              cpu: "30m"
             limits:
               memory: "280Mi"
               cpu: "250m"
@@ -68,8 +68,9 @@ spec:
             httpGet:
               path: /actuator/health/liveness
               port: 9098
-            failureThreshold: 30
             periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 60
 
           # LIVENESS PROBE: Runs continuously after startup passes
           livenessProbe:
@@ -77,7 +78,8 @@ spec:
               path: /actuator/health/liveness
               port: 9098
             periodSeconds: 10
-            timeoutSeconds: 2
+            timeoutSeconds: 5
+            failureThreshold: 3
           
           # READINESS PROBE: Controls traffic routing
           readinessProbe:
@@ -85,6 +87,7 @@ spec:
               path: /actuator/health/readiness
               port: 9098
             periodSeconds: 10
+            timeoutSeconds: 5
             failureThreshold: 3
 ---
 apiVersion: v1

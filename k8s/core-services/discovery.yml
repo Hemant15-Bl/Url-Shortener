@@ -46,8 +46,9 @@ spec:
             httpGet:
               path: /actuator/health/liveness
               port: 8761
-            failureThreshold: 30
             periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 60
 
           # LIVENESS PROBE: Runs continuously after startup passes
           livenessProbe:
@@ -55,14 +56,15 @@ spec:
               path: /actuator/health/liveness
               port: 8761
             periodSeconds: 10
-            timeoutSeconds: 2
-          
+            timeoutSeconds: 5
+            failureThreshold: 3
           # READINESS PROBE: Controls traffic routing
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8761
             periodSeconds: 10
+            timeoutSeconds: 5
             failureThreshold: 3
 ---
 apiVersion: v1

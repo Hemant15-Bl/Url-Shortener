@@ -48,17 +48,18 @@ spec:
           resources:
             requests:
               memory: "128Mi"
-              cpu: "50m"
+              cpu: "40m"
             limits:
               memory: "320Mi"
-              cpu: "400m"
+              cpu: "300m"
           # STARTUP PROBE: Gives your app up to 2 minutes to boot on your 8GB laptop
           startupProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 9099
-            failureThreshold: 40
-            periodSeconds: 6
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 60
 
           # LIVENESS PROBE: Runs continuously after startup passes
           livenessProbe:
@@ -66,7 +67,8 @@ spec:
               path: /actuator/health/liveness
               port: 9099
             periodSeconds: 10
-            timeoutSeconds: 2
+            timeoutSeconds: 5
+            failureThreshold: 3
           
           # READINESS PROBE: Controls traffic routing
           readinessProbe:
@@ -74,6 +76,7 @@ spec:
               path: /actuator/health/readiness
               port: 9099
             periodSeconds: 10
+            timeoutSeconds: 5
             failureThreshold: 3
 ---
 apiVersion: v1
