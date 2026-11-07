@@ -61,20 +61,20 @@ spec:
               cpu: "1000m"
           # NATIVE MYSQL HEALTH CHECK
           startupProbe:
-            exec:
-              command: ["mysqladmin", "ping", "-proot"]
+            tcpSocket:
+              port: 3306
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 60
+            failureThreshold: 90
           livenessProbe:
-            exec:
-              command: ["mysqladmin", "ping", "-proot"]
-            periodSeconds: 15
+            tcpSocket:
+              port: 3306
+            periodSeconds: 20
             timeoutSeconds: 5
-            failureThreshold: 4
+            failureThreshold: 6
           readinessProbe:
-            exec:
-              command: ["mysqladmin", "ping", "-proot"]
+            tcpSocket:
+              port: 3306
             periodSeconds: 15
             timeoutSeconds: 5
             failureThreshold: 3
